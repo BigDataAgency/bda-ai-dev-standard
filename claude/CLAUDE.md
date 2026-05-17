@@ -12,9 +12,15 @@
 
 1. Copy ไฟล์นี้ไปเป็น `CLAUDE.md` ที่ root ของ target repo
 2. Copy `claude/commands/*.md` ไปไว้ที่ `.claude/commands/` ของ target repo
-3. เปิด Claude Code แบบ interactive ใน target repo แล้วใช้ slash commands ได้ เช่น `/fix-bug`, `/review-change`, `/build-feature`, `/write-document`, `/verify-work`
+3. เปิด Claude Code แบบ interactive ใน target repo แล้วใช้ slash commands ได้ เช่น `/fix-bug`, `/review-change`, `/build-feature`, `/write-document`, `/verify-work`, `/standard-feedback`
 
 หมายเหตุ: slash commands ใช้กับ interactive Claude Code เท่านั้น; ใน print mode (`claude -p`) ให้ reference path ของ command หรือ paste เนื้อหา command แทน เพราะ `/command` จะไม่ทำงานแบบ interactive
+
+## Feedback เพื่อปรับปรุงมาตรฐาน
+
+ใช้ `/standard-feedback` หรือ `commands/standard-feedback.md` เมื่อต้องการส่ง feedback เพื่อปรับปรุง BDA AI Dev Standard เอง และอ้างอิง `FEEDBACK.md`, `templates/standard-feedback.md`, `workflows/standard-improvement.md` ตามความเหมาะสม
+
+Feedback นี้ไม่ใช่ Employee Daily Log v5, performance review, score, KPI, daily performance หรือการประเมินบุคคล ให้ใช้เพื่อปรับปรุงมาตรฐาน/command/workflow/template/Claude-Codex support เท่านั้น
 
 ## Output บังคับ
 

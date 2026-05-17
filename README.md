@@ -26,6 +26,7 @@
 - เช็กแอปจริง: `commands/check-real-app.md`
 - เขียนเอกสาร: `commands/write-document.md`
 - อัปเดต Obsidian: `commands/update-obsidian.md`
+- Feedback เพื่อปรับปรุงมาตรฐาน: `commands/standard-feedback.md`
 - Performance: `commands/performance-review.md`
 - Employee Daily Log v5: `commands/employee-daily-log-v5.md`
 - PM Weekly Focus v2: `commands/pm-weekly-focus-v2.md`
@@ -40,8 +41,19 @@
 
 ใช้ `/` command ใน Claude Code ได้เมื่อ copy/ติดตั้งไฟล์จาก `claude/commands/*.md` ไปไว้ใน `.claude/commands/` ของ target repo และ copy `claude/CLAUDE.md` ไปเป็น `CLAUDE.md` ที่ root ของ target repo แล้ว
 
-- Interactive Claude Code: เรียกได้ เช่น `/fix-bug`, `/review-change`, `/build-feature`, `/write-document`
+- Interactive Claude Code: เรียกได้ เช่น `/fix-bug`, `/review-change`, `/build-feature`, `/write-document`, `/standard-feedback`
 - Print mode (`claude -p`): slash command แบบ interactive จะไม่ถูกรันโดยตรง ให้ reference ไฟล์ command (`commands/fix-bug.md`) หรือ paste prompt จาก command แทน
+
+## Feedback loop สำหรับปรับปรุงมาตรฐาน
+
+ถ้าผู้ใช้งานพบว่า BDA AI Dev Standard ควรแก้ไข/เพิ่ม feature/เพิ่ม command/ทำให้ใช้ง่ายขึ้น ให้ใช้ feedback loop แยกนี้:
+
+- อ่าน `FEEDBACK.md`
+- ใช้ `commands/standard-feedback.md`
+- กรอก `templates/standard-feedback.md`
+- ถ้าจะลงมือแก้มาตรฐาน ให้ตาม `workflows/standard-improvement.md`
+
+Feedback loop นี้เป็น product-improvement process สำหรับมาตรฐานเท่านั้น **ไม่ใช่** Employee Daily Log v5, performance review, score, KPI, daily performance หรือการประเมินบุคคล เพราะไม่ใช่ทุกทีม/ทุก role ใช้มาตรฐานนี้ และ non-dev staff อาจไม่เกี่ยวข้อง
 
 ## Output บังคับทุก workflow/command
 

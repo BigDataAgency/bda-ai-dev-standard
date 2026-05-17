@@ -30,6 +30,7 @@ SCENARIOS = {
     "pm-weekly-focus-v2": ["commands/pm-weekly-focus-v2.md", "templates/pm-weekly-focus-v2.md"],
     "update-obsidian": ["commands/update-obsidian.md", "workflows/obsidian.md"],
     "performance-review": ["commands/performance-review.md", "workflows/performance.md"],
+    "standard-feedback": ["commands/standard-feedback.md", "templates/standard-feedback.md", "workflows/standard-improvement.md", "FEEDBACK.md"],
 }
 
 GLOBAL_FILES = [
@@ -45,6 +46,7 @@ CLAUDE_COMMANDS = [
     "claude/commands/build-feature.md",
     "claude/commands/write-document.md",
     "claude/commands/verify-work.md",
+    "claude/commands/standard-feedback.md",
 ]
 
 FORBIDDEN_CLAIMS = [
@@ -91,8 +93,50 @@ def validate_claude_usage_docs() -> None:
                 "claude -p",
                 "/fix-bug",
                 "/review-change",
+                "/standard-feedback",
             ],
         )
+
+
+def validate_standard_feedback_loop() -> None:
+    feedback_files = [
+        "FEEDBACK.md",
+        "commands/standard-feedback.md",
+        "templates/standard-feedback.md",
+        "workflows/standard-improvement.md",
+        "claude/commands/standard-feedback.md",
+    ]
+    required_terms = [
+        "BDA AI Dev Standard",
+        "Employee Daily Log v5",
+        "performance",
+        "ไม่ใช่",
+    ]
+    for rel in feedback_files:
+        assert_contains_all(rel, required_terms)
+
+    assert_contains_all(
+        "templates/standard-feedback.md",
+        [
+            "Tool used",
+            "Command or workflow used",
+            "Expected behavior",
+            "Actual behavior / friction",
+            "Suggested improvement",
+            "Non-performance confirmation",
+        ],
+    )
+
+    assert_contains_all(
+        "README.md",
+        [
+            "FEEDBACK.md",
+            "commands/standard-feedback.md",
+            "templates/standard-feedback.md",
+            "workflows/standard-improvement.md",
+            "ไม่ใช่ทุกทีม/ทุก role ใช้มาตรฐานนี้",
+        ],
+    )
 
 
 def validate_scenario_templates() -> None:
@@ -153,6 +197,7 @@ def main() -> int:
     checks = [
         validate_required_sections,
         validate_claude_usage_docs,
+        validate_standard_feedback_loop,
         validate_scenario_templates,
         validate_no_forbidden_claims,
     ]

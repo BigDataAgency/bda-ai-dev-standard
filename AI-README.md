@@ -26,8 +26,18 @@
 - review: `commands/review-change.md`
 - docs/writing: `commands/write-document.md`
 - Obsidian: `commands/update-obsidian.md`
+- feedback เพื่อปรับปรุง BDA AI Dev Standard: `commands/standard-feedback.md`, `FEEDBACK.md`, `templates/standard-feedback.md`
 - performance: `commands/performance-review.md`
 - ส่งงาน: `commands/handoff-report.md`
+
+## Standard feedback loop
+
+ใช้เมื่อต้องการปรับปรุง/แก้ไข/เพิ่ม feature ให้ BDA AI Dev Standard เอง เช่น bug/confusion/missing command/feature request/scenario/adoption friction/AI output issue
+
+- ใช้ `commands/standard-feedback.md`
+- กรอก `templates/standard-feedback.md`
+- ถ้าต้องแก้มาตรฐาน ให้ใช้ `workflows/standard-improvement.md`
+- ห้ามผูก feedback นี้กับ Employee Daily Log v5, performance review, score, KPI, daily performance หรือการประเมินบุคคล
 
 ## Output มาตรฐาน
 
