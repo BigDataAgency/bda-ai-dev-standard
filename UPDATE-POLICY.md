@@ -9,12 +9,27 @@ Repo นี้คือ source of truth สำหรับ BDA AI Dev Standard
 - Employee-facing files ต้องใช้ถ้อยคำ neutral และไม่อ้างแหล่งภายนอก
 - ถ้ามีการ adapt แนวคิดหรือไฟล์ที่มี license ให้ใส่ใน `THIRD_PARTY_NOTICES.md`
 
+## Versioning
+
+BDA AI Dev Standard ใช้ Semantic Versioning: `MAJOR.MINOR.PATCH`
+
+- MAJOR: breaking changes to command names, required output sections, installation layout, or compatibility
+- MINOR: new commands, workflows, templates, adapters, or substantial behavior improvements
+- PATCH: clarifications, typo fixes, safer wording, and non-breaking documentation updates
+
+แหล่งอ้างอิงเลข version:
+
+- `VERSION` = current version
+- `CHANGELOG.md` = release history
+- Git tag/release = public checkpoint เช่น `v0.1.0`
+
 ## Release flow
 1. แก้ใน branch หรือ commit ที่ชัดเจน
 2. Review ด้วย `commands/review-change.md`
 3. Verify ด้วย `commands/verify-work.md`
-4. Tag หรือประกาศ version ถ้าเป็น update ใหญ่
-5. Rollout ไปยัง AI tools / team docs จาก repo นี้เท่านั้น
+4. อัปเดต `VERSION` และ `CHANGELOG.md` ถ้าเป็น release
+5. สร้าง Git tag/release สำหรับ public checkpoint
+6. Rollout ไปยัง AI tools / team docs จาก repo นี้เท่านั้น
 
 ## Feedback-driven improvements
 - รับ feedback เพื่อปรับปรุงมาตรฐานผ่าน `FEEDBACK.md`, `commands/standard-feedback.md`, และ `templates/standard-feedback.md`

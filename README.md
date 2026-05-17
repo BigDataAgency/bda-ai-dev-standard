@@ -1,6 +1,20 @@
 # BDA AI Dev Standard
 
+Version: `0.1.0`
+License: MIT
+
 มาตรฐานกลางสำหรับการทำงานร่วมกับ AI ในงานพัฒนา ซ่อมบั๊ก ตรวจโค้ด เขียนเอกสาร งาน Obsidian งาน Performance และงานติดตามทีมของ BDA
+
+แนวคิดหลัก: ผู้ใช้ไม่ต้องไล่ตามเครื่องมือ/เทคนิคใหม่ตลอดเวลา — ใช้ command และ workflow เดิมได้ แต่ไส้ในของ standard จะถูกปรับปรุงเป็น version ใหม่เมื่อมีวิธีที่ดีกว่า ปลอดภัยกว่า หรือใช้งานจริงได้ดีกว่า
+
+## Versioning
+
+BDA AI Dev Standard ใช้ Semantic Versioning: `MAJOR.MINOR.PATCH`
+
+- Current version: `0.1.0`
+- ดูประวัติการเปลี่ยนแปลงที่ `CHANGELOG.md`
+- เลข version หลักอยู่ใน `VERSION`
+- ทุก update สำคัญต้องเปลี่ยน version ใน repo นี้ก่อน rollout
 
 ## Quickstart สำหรับคนใช้งาน
 
