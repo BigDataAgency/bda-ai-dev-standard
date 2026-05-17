@@ -1,5 +1,5 @@
-# /review-change
+# /write-document
 
-ใช้ command หลักจาก `commands/review-change.md` และตอบตาม BDA AI Dev Standard เป็นภาษาไทย
+ใช้ command หลักจาก `commands/write-document.md` และตอบตาม BDA AI Dev Standard เป็นภาษาไทย
 
 ต้องรายงานหัวข้อบังคับ: BDA Standard files used, Pipeline trace, Commands run, Verification / Evidence, Limitations / Risks / Next steps

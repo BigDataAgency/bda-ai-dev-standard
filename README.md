@@ -36,9 +36,27 @@
 - Codex: ใช้ `codex/AGENTS.md`
 - Claude: ใช้ `claude/CLAUDE.md` และ `claude/commands/`
 
+### Claude slash commands
+
+ใช้ `/` command ใน Claude Code ได้เมื่อ copy/ติดตั้งไฟล์จาก `claude/commands/*.md` ไปไว้ใน `.claude/commands/` ของ target repo และ copy `claude/CLAUDE.md` ไปเป็น `CLAUDE.md` ที่ root ของ target repo แล้ว
+
+- Interactive Claude Code: เรียกได้ เช่น `/fix-bug`, `/review-change`, `/build-feature`, `/write-document`
+- Print mode (`claude -p`): slash command แบบ interactive จะไม่ถูกรันโดยตรง ให้ reference ไฟล์ command (`commands/fix-bug.md`) หรือ paste prompt จาก command แทน
+
+## Output บังคับทุก workflow/command
+
+ทุกงานที่ใช้ BDA AI Dev Standard ต้องรายงานหัวข้อต่อไปนี้ให้ครบ:
+
+- **BDA Standard files used**: path ของไฟล์มาตรฐาน BDA ที่เปิด/อ้างอิงจริง
+- **Pipeline trace**: ลำดับ Understand → Plan → Execute → Verify → Handoff พร้อม workflow/command ที่ใช้จริง
+- **Commands run**: คำสั่งหรือ tool ที่รันจริง พร้อมผลสรุป; ถ้าไม่ได้รันให้ระบุเหตุผล
+- **Verification / Evidence**: หลักฐานตรวจจริง เช่น test/lint/build/manual check/diff/link
+- **Limitations / Risks / Next steps**: ข้อจำกัด ความเสี่ยง และงานต่อ
+
 ## หลักการสำคัญ
 
 - ห้ามส่งงานโดยไม่มี evidence
 - ห้ามบอกว่า test ผ่านถ้าไม่ได้รันจริง
 - ห้ามแก้ shared repo หรือ production โดยไม่ยืนยัน scope
+- ห้ามส่งงานโดยไม่ระบุไฟล์มาตรฐาน BDA ที่ใช้, pipeline trace, และ commands run
 - ทุก update ของมาตรฐานนี้ต้องทำใน repo นี้ก่อน แล้วค่อย rollout

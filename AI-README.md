@@ -13,6 +13,7 @@
 5) ลงมือทำด้วย tool ที่เหมาะสม
 6) verify ด้วยคำสั่งจริงหรือหลักฐานจริง
 7) ส่ง handoff เป็นภาษาไทย พร้อมไฟล์ที่แก้, ผลทดสอบ, ข้อจำกัด, next step
+8) ทุก output ต้องมีหัวข้อ: BDA Standard files used, Pipeline trace, Commands run, Verification / Evidence, Limitations / Risks / Next steps
 ห้ามอ้างว่าเสร็จหรือผ่าน test ถ้าไม่ได้ตรวจจริง
 ```
 
@@ -30,6 +31,10 @@
 
 ## Output มาตรฐาน
 
+- BDA Standard files used: path ของไฟล์มาตรฐาน BDA ที่ใช้จริง เช่น `STANDARD.md`, `commands/...`, `workflows/...`, `policies/...`, `checklists/...`, `templates/...`
+- Pipeline trace: Understand → Plan → Execute → Verify → Handoff พร้อม command/workflow ที่ใช้จริง
+- Commands run: คำสั่งหรือ tool ที่รันจริงและผลสรุป; ถ้าไม่ได้รันให้บอกเหตุผล
+- Verification / Evidence: หลักฐานตรวจจริง เช่น test/lint/build/manual check/diff/link
 - ทำอะไรไป
 - ไฟล์ที่แก้/สร้าง
 - วิธี verify และผลลัพธ์

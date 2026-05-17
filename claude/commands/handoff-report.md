@@ -1,3 +1,5 @@
 # /handoff-report
 
 ใช้ command หลักจาก `commands/handoff-report.md` และตอบตาม BDA AI Dev Standard เป็นภาษาไทย
+
+ต้องรายงานหัวข้อบังคับ: BDA Standard files used, Pipeline trace, Commands run, Verification / Evidence, Limitations / Risks / Next steps
