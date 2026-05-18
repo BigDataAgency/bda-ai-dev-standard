@@ -88,6 +88,22 @@ function extractMarkdownField(text, label) {
   return extractFirst(new RegExp(`^-\\s*${escaped}\\s*:\\s*(.+)$`, 'im'), text);
 }
 
+function stripMarkdown(value) {
+  return String(value || '')
+    .replace(/\*\*/g, '')
+    .replace(/^`|`$/g, '')
+    .trim();
+}
+
+function extractAnyMarkdownField(text, labels) {
+  for (const label of labels) {
+    const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const value = extractFirst(new RegExp(`^-\\s*(?:\\*\\*)?${escaped}(?:\\*\\*)?\\s*[:：]\\s*(.+)$`, 'im'), text);
+    if (value) return stripMarkdown(value);
+  }
+  return '';
+}
+
 function normalizeStatus(raw) {
   const value = String(raw || '').toUpperCase();
   if (/FAIL/.test(value)) return 'FAIL';
@@ -115,6 +131,18 @@ function parseEvidenceManifest(text) {
       safe_to_share_externally: extractFirst(/^\s*-\s*Safe to share externally\?\s*(.+)$/im, block),
     }));
   }
+  if (!evidence.length) {
+    const labeledPathRegex = /^-\s*([^:\n]+):\s*`([^`\n]+)`\s*$/gim;
+    while ((match = labeledPathRegex.exec(text)) !== null) {
+      evidence.push(redactDeep({
+        file: match[2].trim(),
+        scenario_step: match[1].trim(),
+        contains_sensitive_data: 'not stated',
+        masking_applied: 'not stated',
+        safe_to_share_externally: 'not stated',
+      }));
+    }
+  }
   return evidence;
 }
 
@@ -124,15 +152,20 @@ function countScenarioStatuses(text) {
     const status = normalizeStatus(match[1]);
     if (status) counts[status] = (counts[status] || 0) + 1;
   }
+  for (const match of text.matchAll(/^\s*-\s*(?:\*\*)?(?:Result|ผล)(?:\*\*)?\s*[:：]\s*([A-Z_]+)/gim)) {
+    const status = normalizeStatus(match[1]);
+    if (status) counts[status] = (counts[status] || 0) + 1;
+  }
   return counts;
 }
 
 function buildSummaryFromMarkdown(text, args) {
   const h1 = extractFirst(/^#\s+(.+)$/m, text);
-  const reportTitle = extractMarkdownField(text, 'Report title') || h1;
-  const project = args.project || extractMarkdownField(text, 'Product/feature');
+  const reportTitle = extractAnyMarkdownField(text, ['Report title', 'ชื่อรายงาน']) || h1;
+  const project = args.project || extractAnyMarkdownField(text, ['Product/feature', 'โครงการ']);
   const statusCounts = countScenarioStatuses(text);
-  const status = normalizeStatus(extractMarkdownField(text, 'Status summary')) ||
+  const statusSummary = extractAnyMarkdownField(text, ['Status summary', 'สถานะสรุป']);
+  const status = normalizeStatus(statusSummary) ||
     (statusCounts.FAIL ? 'FAIL' : statusCounts.BLOCKED ? 'BLOCKED' : statusCounts.PASS ? 'PASS' : '');
   const evidenceManifest = parseEvidenceManifest(text);
 
@@ -143,13 +176,13 @@ function buildSummaryFromMarkdown(text, args) {
     report_title: reportTitle,
     status,
     summary: {
-      environment: extractMarkdownField(text, 'Environment'),
-      base_url: extractMarkdownField(text, 'Base URL'),
-      build_version_commit: extractMarkdownField(text, 'Build/version/commit'),
-      date_time: extractMarkdownField(text, 'Date/time'),
-      tester_agent_tool: extractMarkdownField(text, 'Tester/agent/tool'),
-      test_account_classification: extractMarkdownField(text, 'Test account classification'),
-      credentials_secrets_included: extractMarkdownField(text, 'Credentials/secrets included in report?'),
+      environment: extractAnyMarkdownField(text, ['Environment', 'สภาพแวดล้อมที่ตรวจ']),
+      base_url: extractAnyMarkdownField(text, ['Base URL']) || extractFirst(/(https?:\/\/[^\s`)]+)/i, text),
+      build_version_commit: extractAnyMarkdownField(text, ['Build/version/commit']),
+      date_time: extractAnyMarkdownField(text, ['Date/time', 'วันที่รายงาน']),
+      tester_agent_tool: extractAnyMarkdownField(text, ['Tester/agent/tool']),
+      test_account_classification: extractAnyMarkdownField(text, ['Test account classification']),
+      credentials_secrets_included: extractAnyMarkdownField(text, ['Credentials/secrets included in report?']),
       scenario_counts: statusCounts,
     },
     evidence_manifest: evidenceManifest,
