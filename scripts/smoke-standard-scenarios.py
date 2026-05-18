@@ -13,6 +13,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SANDBOX = Path("/tmp/bda-ai-dev-standard-smoke")
+EXPECTED_VERSION = "0.4.0"
 
 REQUIRED_SECTIONS = [
     "BDA Standard files used",
@@ -32,6 +33,9 @@ SCENARIOS = {
     "performance-review": ["commands/performance-review.md", "workflows/performance.md"],
     "standard-feedback": ["commands/standard-feedback.md", "templates/standard-feedback.md", "workflows/standard-improvement.md", "FEEDBACK.md"],
     "test-scenario-report": ["commands/test-scenario-report.md", "templates/test-scenario-report.md", "workflows/test-scenario-report.md"],
+    "daily-log": ["commands/daily-log.md", "templates/daily-log-v5.md"],
+    "weekly-focus": ["commands/weekly-focus.md", "templates/pm-weekly-focus-v2.md"],
+    "test-report": ["commands/test-report.md", "templates/test-scenario-report.md", "workflows/test-scenario-report.md"],
 }
 
 GLOBAL_FILES = [
@@ -49,6 +53,38 @@ CLAUDE_COMMANDS = [
     "claude/commands/verify-work.md",
     "claude/commands/standard-feedback.md",
     "claude/commands/test-scenario-report.md",
+    "claude/commands/daily-log.md",
+    "claude/commands/weekly-focus.md",
+    "claude/commands/test-report.md",
+]
+
+STAFF_COMMAND_PACK = {
+    "daily-log": {
+        "command": "commands/daily-log.md",
+        "claude": "claude/commands/daily-log.md",
+        "legacy": "commands/employee-daily-log-v5.md",
+        "terms": ["Daily Log", "Daily Log v5", "AI usage", "tomorrow focus"],
+    },
+    "weekly-focus": {
+        "command": "commands/weekly-focus.md",
+        "claude": "claude/commands/weekly-focus.md",
+        "legacy": "commands/pm-weekly-focus-v2.md",
+        "terms": ["Weekly Focus", "weekly focus v2", "priorities", "committed", "stretch"],
+    },
+    "test-report": {
+        "command": "commands/test-report.md",
+        "claude": "claude/commands/test-report.md",
+        "legacy": "commands/test-scenario-report.md",
+        "terms": ["Test Report", "QA/product evidence", "screenshot", "test matrix", "expected", "actual"],
+    },
+}
+
+# Optional staff adapters: if these files are added by the v0.4.0 implementation,
+# validate that they expose the normal staff command names rather than v5/v2 names.
+OPTIONAL_STAFF_ADAPTER_GLOBS = [
+    "staff/**/*.md",
+    "gemini/**/*.md",
+    "claude-coworker/**/*.md",
 ]
 
 FORBIDDEN_CLAIMS = [
@@ -69,6 +105,15 @@ def assert_contains_all(rel: str, terms: list[str]) -> None:
     missing = [term for term in terms if term not in text]
     if missing:
         raise AssertionError(f"{rel} missing required terms: {missing}")
+
+
+def validate_version_consistency() -> None:
+    version = read("VERSION").strip()
+    if version != EXPECTED_VERSION:
+        raise AssertionError(f"VERSION is {version!r}, expected {EXPECTED_VERSION!r}")
+
+    assert_contains_all("README.md", [f"Version: `{EXPECTED_VERSION}`", f"Current version: `{EXPECTED_VERSION}`"])
+    assert_contains_all("CHANGELOG.md", [f"## [{EXPECTED_VERSION}]", "daily-log", "weekly-focus", "test-report"])
 
 
 def validate_required_sections() -> None:
@@ -96,9 +141,59 @@ def validate_claude_usage_docs() -> None:
                 "/fix-bug",
                 "/review-change",
                 "/standard-feedback",
-                "/test-scenario-report",
+                "/daily-log",
+                "/weekly-focus",
+                "/test-report",
             ],
         )
+
+
+def validate_staff_command_pack() -> None:
+    for name, spec in STAFF_COMMAND_PACK.items():
+        assert_contains_all(spec["command"], [*REQUIRED_SECTIONS, *spec["terms"], spec["legacy"]])
+        assert_contains_all(spec["claude"], [f"/{name}", spec["command"], *REQUIRED_SECTIONS])
+
+    # User-facing docs should advertise normal command names. Legacy v5/v2 names
+    # may remain as implementation/template details, but not as primary slash commands.
+    for rel in ["README.md", "claude/CLAUDE.md"]:
+        assert_contains_all(
+            rel,
+            [
+                "commands/daily-log.md",
+                "commands/weekly-focus.md",
+                "commands/test-report.md",
+                "/daily-log",
+                "/weekly-focus",
+                "/test-report",
+            ],
+        )
+        text = read(rel)
+        forbidden = [r"(?<![A-Za-z0-9_.-])/employee-daily-log-v5", r"(?<![A-Za-z0-9_.-])/pm-weekly-focus-v2", r"(?<![A-Za-z0-9_.-])/test-scenario-report"]
+        found = [pattern for pattern in forbidden if re.search(pattern, text)]
+        if found:
+            raise AssertionError(f"{rel} exposes legacy/versioned slash command names: {found}")
+
+
+def validate_optional_staff_adapters() -> None:
+    adapter_paths: list[Path] = []
+    for pattern in OPTIONAL_STAFF_ADAPTER_GLOBS:
+        adapter_paths.extend(ROOT.glob(pattern))
+
+    # The v0.4.0 pack may add staff/gemini/claude-coworker prompt files; when
+    # present, they must point staff users at normal command names. Internal
+    # source-of-truth paths may still mention the legacy canonical files.
+    for path in sorted(set(adapter_paths)):
+        rel = str(path.relative_to(ROOT))
+        if path.name == "README.md":
+            assert_contains_all(rel, ["daily-log", "weekly-focus", "test-report"])
+        elif path.stem in STAFF_COMMAND_PACK:
+            assert_contains_all(rel, [path.stem, STAFF_COMMAND_PACK[path.stem]["command"]])
+
+        text = read(rel)
+        forbidden_slash = [r"(?<![A-Za-z0-9_.-])/employee-daily-log-v5", r"(?<![A-Za-z0-9_.-])/pm-weekly-focus-v2", r"(?<![A-Za-z0-9_.-])/test-scenario-report"]
+        found = [pattern for pattern in forbidden_slash if re.search(pattern, text)]
+        if found:
+            raise AssertionError(f"{rel} exposes legacy/versioned slash command names: {found}")
 
 
 def validate_standard_feedback_loop() -> None:
@@ -169,7 +264,9 @@ def validate_test_scenario_report_workflow() -> None:
     assert_contains_all(
         "templates/test-scenario-report.md",
         [
-            "Pass / Fail / Blocked / Not run",
+            "PASS / FAIL",
+            "BLOCKED",
+            "NOT_RUN",
             "MEDIA:/absolute/path/to",
             "Console errors",
             "Network/API failures",
@@ -183,7 +280,7 @@ def validate_test_scenario_report_workflow() -> None:
             "commands/test-scenario-report.md",
             "workflows/test-scenario-report.md",
             "templates/test-scenario-report.md",
-            "claude/commands/test-scenario-report.md",
+            "claude/commands/test-report.md",
             "visible-menu navigation",
             "technical verification only",
         ],
@@ -246,8 +343,11 @@ def validate_no_forbidden_claims() -> None:
 
 def main() -> int:
     checks = [
+        validate_version_consistency,
         validate_required_sections,
         validate_claude_usage_docs,
+        validate_staff_command_pack,
+        validate_optional_staff_adapters,
         validate_standard_feedback_loop,
         validate_test_scenario_report_workflow,
         validate_scenario_templates,

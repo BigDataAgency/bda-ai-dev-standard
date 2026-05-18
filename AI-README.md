@@ -26,10 +26,18 @@
 - review: `commands/review-change.md`
 - docs/writing: `commands/write-document.md`
 - Obsidian: `commands/update-obsidian.md`
-- QA/product evidence พร้อม screenshot report: `commands/test-scenario-report.md`, `workflows/test-scenario-report.md`, `templates/test-scenario-report.md`
+- staff daily log: `commands/daily-log.md` (internal source `commands/employee-daily-log-v5.md`)
+- staff weekly focus: `commands/weekly-focus.md` (internal source `commands/pm-weekly-focus-v2.md`)
+- QA/product evidence พร้อม screenshot report: `commands/test-report.md` (internal source `commands/test-scenario-report.md`), `workflows/test-scenario-report.md`, `templates/test-scenario-report.md`
 - feedback เพื่อปรับปรุง BDA AI Dev Standard: `commands/standard-feedback.md`, `FEEDBACK.md`, `templates/standard-feedback.md`
 - performance: `commands/performance-review.md`
 - ส่งงาน: `commands/handoff-report.md`
+
+## Staff command pack v0.4.0
+
+ใช้ชื่อปกติสำหรับ staff: `daily-log`, `weekly-focus`, `test-report`. ชื่อ versioned เช่น `employee-daily-log-v5` และ `pm-weekly-focus-v2` เป็น internal source of truth ไม่ใช่ชื่อที่ staff ต้องจำ.
+
+Adapter notes: Claude Code ใช้ slash commands เฉพาะ interactive mode; Gemini/Claude coworker ใช้ prompt commands; Codex ใช้ agent instruction ใน `codex/AGENTS.md`.
 
 ## Test scenario report workflow
 

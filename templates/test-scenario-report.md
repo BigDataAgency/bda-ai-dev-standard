@@ -2,6 +2,8 @@
 
 > ใช้สำหรับ QA/product evidence: test case / scenario execution พร้อม screenshot capture และ report generation เท่านั้น ไม่ใช่ Employee Daily Log v5, performance review, score, KPI หรือการประเมินบุคคล
 
+Status summary vocabulary: Pass / Fail / Blocked / Not run (map to detailed statuses such as PASS, FAIL, BLOCKED_*, NOT_RUN as needed).
+
 ## Summary
 
 - Report title:

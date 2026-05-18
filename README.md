@@ -1,6 +1,6 @@
 # BDA AI Dev Standard
 
-Version: `0.2.0`
+Version: `0.4.0`
 License: MIT
 
 มาตรฐานกลางสำหรับการทำงานร่วมกับ AI ในงานพัฒนา ซ่อมบั๊ก ตรวจโค้ด เขียนเอกสาร งาน Obsidian งาน Performance และงานติดตามทีมของ BDA
@@ -11,7 +11,7 @@ License: MIT
 
 BDA AI Dev Standard ใช้ Semantic Versioning: `MAJOR.MINOR.PATCH`
 
-- Current version: `0.3.0`
+- Current version: `0.4.0`
 - ดูประวัติการเปลี่ยนแปลงที่ `CHANGELOG.md`
 - เลข version หลักอยู่ใน `VERSION`
 - ทุก update สำคัญต้องเปลี่ยน version ใน repo นี้ก่อน rollout
@@ -38,14 +38,14 @@ BDA AI Dev Standard ใช้ Semantic Versioning: `MAJOR.MINOR.PATCH`
 - แก้บั๊ก: `commands/fix-bug.md`
 - Code Review: `commands/review-change.md`
 - เช็กแอปจริง: `commands/check-real-app.md`
-- รายงาน test scenario พร้อม screenshot: `commands/test-scenario-report.md`
+- รายงาน test scenario พร้อม screenshot: `commands/test-report.md` (alias ของ `commands/test-scenario-report.md`)
 - เขียนเอกสาร: `commands/write-document.md`
 - อัปเดต Obsidian: `commands/update-obsidian.md`
 - Feedback เพื่อปรับปรุงมาตรฐาน: `commands/standard-feedback.md`
-- Test Scenario Report (QA/product evidence): `commands/test-scenario-report.md`
+- Test Report (QA/product evidence): `commands/test-report.md` (internal source: `commands/test-scenario-report.md`)
 - Performance: `commands/performance-review.md`
-- Employee Daily Log v5: `commands/employee-daily-log-v5.md`
-- PM Weekly Focus v2: `commands/pm-weekly-focus-v2.md`
+- Daily Log: `commands/daily-log.md` (internal source: `commands/employee-daily-log-v5.md`)
+- Weekly Focus: `commands/weekly-focus.md` (internal source: `commands/pm-weekly-focus-v2.md`)
 
 ## ใช้กับ AI ตัวไหนได้บ้าง
 
@@ -57,17 +57,36 @@ BDA AI Dev Standard ใช้ Semantic Versioning: `MAJOR.MINOR.PATCH`
 
 ใช้ `/` command ใน Claude Code ได้เมื่อ copy/ติดตั้งไฟล์จาก `claude/commands/*.md` ไปไว้ใน `.claude/commands/` ของ target repo และ copy `claude/CLAUDE.md` ไปเป็น `CLAUDE.md` ที่ root ของ target repo แล้ว
 
-- Interactive Claude Code: เรียกได้ เช่น `/fix-bug`, `/review-change`, `/build-feature`, `/write-document`, `/standard-feedback`, `/test-scenario-report`
+- Interactive Claude Code: เรียกได้ เช่น `/fix-bug`, `/review-change`, `/build-feature`, `/write-document`, `/standard-feedback`, `/daily-log`, `/weekly-focus`, `/test-report`
 - Print mode (`claude -p`): slash command แบบ interactive จะไม่ถูกรันโดยตรง ให้ reference ไฟล์ command (`commands/fix-bug.md`) หรือ paste prompt จาก command แทน
+
+
+## Staff command pack v0.4.0
+
+Staff-facing command names use normal names without internal version suffixes:
+
+- Daily Log: `commands/daily-log.md` → internal source of truth `commands/employee-daily-log-v5.md` and template `templates/daily-log-v5.md`
+- Weekly Focus: `commands/weekly-focus.md` → internal source of truth `commands/pm-weekly-focus-v2.md` and template `templates/pm-weekly-focus-v2.md`
+- Test Report: `commands/test-report.md` → internal QA/product evidence standard `commands/test-scenario-report.md`, `workflows/test-scenario-report.md`, `templates/test-scenario-report.md`
+
+Adapter usage:
+
+- Claude Code: copy `claude/commands/*.md` to `.claude/commands/` and use slash commands `/daily-log`, `/weekly-focus`, `/test-report` in interactive Claude Code only.
+- Gemini: use prompt commands in `gemini/prompts/`; Gemini does not use Claude Code slash commands.
+- Claude coworker: use prompt commands in `claude-coworker/prompts/`; these are paste/reference prompts, not Claude Code slash commands.
+- Codex: use `codex/AGENTS.md` as agent instruction and reference the staff command files by path.
+
+These aliases keep canonical/versioned standards internal so staff do not need to remember `v5` or `v2` names.
 
 ## QA/Product evidence workflow
 
-เมื่อต้องการทำ test case/scenario พร้อม capture screenshot และสร้างรายงาน ให้ใช้ชุดนี้:
+เมื่อต้องการทำ test case/scenario พร้อม capture screenshot และสร้างรายงาน ให้ใช้ชื่อ staff-facing ปกติ `test-report` (alias ของ internal `test-scenario-report`):
 
-- Command: `commands/test-scenario-report.md`
+- Staff command: `commands/test-report.md`
+- Internal command/source of truth: `commands/test-scenario-report.md`
 - Workflow: `workflows/test-scenario-report.md`
 - Template: `templates/test-scenario-report.md`
-- Claude slash command: `/test-scenario-report` จาก `claude/commands/test-scenario-report.md`
+- Claude Code slash command: `/test-report` จาก `claude/commands/test-report.md` (slash command ใช้กับ Claude Code interactive เท่านั้น)
 
 Workflow นี้เป็น QA/product evidence workflow เท่านั้น **ไม่ใช่** Employee Daily Log v5, performance review, score, KPI, daily performance หรือการประเมินบุคคล
 

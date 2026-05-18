@@ -8,6 +8,29 @@ This project uses Semantic Versioning: `MAJOR.MINOR.PATCH`.
 - MINOR: new commands, workflows, templates, adapters, or substantial behavior improvements
 - PATCH: clarifications, typo fixes, safer wording, and non-breaking documentation updates
 
+## [0.4.0] - 2026-05-18
+
+### Added
+
+- Staff command pack with normal, non-versioned command names:
+  - `commands/daily-log.md` maps to internal `commands/employee-daily-log-v5.md`.
+  - `commands/weekly-focus.md` maps to internal `commands/pm-weekly-focus-v2.md`.
+  - `commands/test-report.md` maps to internal QA/product evidence standard `commands/test-scenario-report.md`.
+- Claude Code slash aliases: `/daily-log`, `/weekly-focus`, `/test-report`.
+- Staff documentation under `staff/commands/` and adapter prompt packs for Gemini and Claude coworker.
+- Codex/Claude/general AI docs now describe staff command aliases and adapter-specific usage.
+
+### Changed
+
+- Updated current version metadata to `0.4.0`.
+- Kept canonical versioned standards internal while exposing staff-friendly aliases.
+
+### Guardrails
+
+- Daily Log requires missing commit/link/output evidence to be marked as pending evidence instead of invented.
+- Weekly Focus remains a planning/coordination artifact and must not become performance scoring.
+- Test Report keeps QA/product evidence behavior and must not be used for individual performance evaluation.
+
 ## [0.3.0] - 2026-05-18
 
 ### Changed
