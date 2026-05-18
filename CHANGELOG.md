@@ -8,6 +8,22 @@ This project uses Semantic Versioning: `MAJOR.MINOR.PATCH`.
 - MINOR: new commands, workflows, templates, adapters, or substantial behavior improvements
 - PATCH: clarifications, typo fixes, safer wording, and non-breaking documentation updates
 
+## [0.4.1] - 2026-05-18
+
+### Added
+
+- Public-repo ingress protection hardening:
+  - `.env.example` with local-only defaults and empty InnoHub ingest placeholders.
+  - `SECURITY.md` documenting public repository boundaries, local-output default mode, and private production-ingest requirements.
+  - `docs/public-ingest-guardrails.md` for future private InnoHub connector controls.
+  - `scripts/security-public-repo-check.sh` to block production endpoint/secret patterns in public files.
+
+### Changed
+
+- Expanded `.gitignore` coverage for local env files, credentials, secrets, and private key material while keeping `.env.example` tracked.
+- Added README security notice for public repository usage and no auto-ingest defaults.
+- Updated current version metadata to `0.4.1`.
+
 ## [0.4.0] - 2026-05-18
 
 ### Added

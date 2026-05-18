@@ -1,3 +1,28 @@
 .DS_Store
+
+# Local environment and credentials
 .env
+.env.*
+!.env.example
+
+# Logs
 *.log
+
+# Secrets and key material
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+*.der
+*.kdbx
+id_rsa
+id_dsa
+id_ecdsa
+id_ed25519
+credentials/
+secrets/
+*.credentials
+*.secret
+*.secrets
