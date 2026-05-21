@@ -1,6 +1,6 @@
 # BDA AI Dev Standard
 
-Version: `0.5.0`
+Version: `0.6.0`
 License: MIT
 
 มาตรฐานกลางสำหรับการทำงานร่วมกับ AI ในงานพัฒนา ซ่อมบั๊ก ตรวจโค้ด เขียนเอกสาร งาน Obsidian งาน Performance และงานติดตามทีมของ BDA
@@ -11,7 +11,7 @@ License: MIT
 
 BDA AI Dev Standard ใช้ Semantic Versioning: `MAJOR.MINOR.PATCH`
 
-- Current version: `0.5.0`
+- Current version: `0.6.0`
 - ดูประวัติการเปลี่ยนแปลงที่ `CHANGELOG.md`
 - เลข version หลักอยู่ใน `VERSION`
 - ทุก update สำคัญต้องเปลี่ยน version ใน repo นี้ก่อน rollout
@@ -48,10 +48,10 @@ BDA AI Dev Standard ใช้ Semantic Versioning: `MAJOR.MINOR.PATCH`
 - เขียนเอกสาร: `commands/write-document.md`
 - อัปเดต Obsidian: `commands/update-obsidian.md`
 - Feedback เพื่อปรับปรุงมาตรฐาน: `commands/standard-feedback.md`
-- Test Report (QA/product evidence): `commands/test-report.md` (internal source: `commands/test-scenario-report.md`)
+- Test Report (QA/product evidence): `commands/test-report.md` (source: `commands/test-scenario-report.md`)
 - Performance: `commands/performance-review.md`
-- Daily Log: `commands/daily-log.md` (internal source: `commands/employee-daily-log-v5.md`)
-- Weekly Focus: `commands/weekly-focus.md` (internal source: `commands/pm-weekly-focus-v2.md`)
+- Daily Log: `commands/daily-log.md`
+- Weekly Focus: `commands/weekly-focus.md`
 
 ## ใช้กับ AI ตัวไหนได้บ้าง
 
@@ -67,22 +67,20 @@ BDA AI Dev Standard ใช้ Semantic Versioning: `MAJOR.MINOR.PATCH`
 - Print mode (`claude -p`): slash command แบบ interactive จะไม่ถูกรันโดยตรง ให้ reference ไฟล์ command (`commands/fix-bug.md`) หรือ paste prompt จาก command แทน
 
 
-## Staff command pack v0.4.0
+## Command Pack
 
-Staff-facing command names use normal names without internal version suffixes:
+Command names use normal names without legacy version suffixes:
 
-- Daily Log: `commands/daily-log.md` → internal source of truth `commands/employee-daily-log-v5.md` and template `templates/daily-log-v5.md`
-- Weekly Focus: `commands/weekly-focus.md` → internal source of truth `commands/pm-weekly-focus-v2.md` and template `templates/pm-weekly-focus-v2.md`
-- Test Report: `commands/test-report.md` → internal QA/product evidence standard `commands/test-scenario-report.md`, `workflows/test-scenario-report.md`, `templates/test-scenario-report.md`
+- Daily Log: `commands/daily-log.md` and template `templates/daily-log.md`
+- Weekly Focus: `commands/weekly-focus.md` and template `templates/weekly-focus.md`
+- Test Report: `commands/test-report.md`, `commands/test-scenario-report.md`, `workflows/test-scenario-report.md`, `templates/test-scenario-report.md`
 
 Adapter usage:
 
 - Claude Code: copy `claude/commands/*.md` to `.claude/commands/` and use slash commands `/daily-log`, `/weekly-focus`, `/test-report` in interactive Claude Code only.
 - Gemini: use prompt commands in `gemini/prompts/`; Gemini does not use Claude Code slash commands.
 - Claude coworker: use prompt commands in `claude-coworker/prompts/`; these are paste/reference prompts, not Claude Code slash commands.
-- Codex: use `codex/AGENTS.md` as agent instruction and reference the staff command files by path.
-
-These aliases keep canonical/versioned standards internal so staff do not need to remember `v5` or `v2` names.
+- Codex: use `codex/AGENTS.md` as agent instruction and reference the command files by path.
 
 ## Obsidian init context workflow
 
@@ -99,15 +97,15 @@ These aliases keep canonical/versioned standards internal so staff do not need t
 
 ## QA/Product evidence workflow
 
-เมื่อต้องการทำ test case/scenario พร้อม capture screenshot และสร้างรายงาน ให้ใช้ชื่อ staff-facing ปกติ `test-report` (alias ของ internal `test-scenario-report`):
+เมื่อต้องการทำ test case/scenario พร้อม capture screenshot และสร้างรายงาน ให้ใช้ชื่อ user-facing ปกติ `test-report`:
 
-- Staff command: `commands/test-report.md`
-- Internal command/source of truth: `commands/test-scenario-report.md`
+- Command: `commands/test-report.md`
+- Detailed command: `commands/test-scenario-report.md`
 - Workflow: `workflows/test-scenario-report.md`
 - Template: `templates/test-scenario-report.md`
 - Claude Code slash command: `/test-report` จาก `claude/commands/test-report.md` (slash command ใช้กับ Claude Code interactive เท่านั้น)
 
-Workflow นี้เป็น QA/product evidence workflow เท่านั้น **ไม่ใช่** Employee Daily Log v5, performance review, score, KPI, daily performance หรือการประเมินบุคคล
+Workflow นี้เป็น QA/product evidence workflow เท่านั้น **ไม่ใช่** Daily Log, performance review, score, KPI, daily performance หรือการประเมินบุคคล
 
 สำหรับ InnoHub หรือ user-facing checks ให้ใช้ visible-menu navigation เป็น default และห้ามใช้ hidden route/direct URL เพื่อ claim user journey เว้นแต่ label ชัดว่าเป็น technical verification only
 
@@ -119,7 +117,7 @@ Security defaults:
 
 - Dry-run/local JSON output is the default; no network request is made unless `--send` is provided.
 - Remote send requires explicit `--send` plus an endpoint and a private token source (`--token-file`, `--token-env`, or private env).
-- Staff SOP: `docs/staff-report-sender-sop.md`; staff command: `commands/send-report.md`.
+- Staff SOP: `docs/staff-report-sender-sop.md`; command: `commands/send-report.md`.
 - Transitional GitHub/KitHub sync SOP: `docs/github-to-innohub-sync-sop.md`; sync script: `scripts/sync-github-reports.mjs`.
 - Private env alternatives are supported for authorized staff/CI: `INNOHUB_INGEST_URL`, `INNOHUB_INGEST_TOKEN_FILE`, `INNOHUB_INGEST_TOKEN`, and `INNOHUB_TENANT_ID`.
 - No production endpoint or token is committed here; use private deployment configuration outside this public repo.
@@ -154,7 +152,7 @@ npm run test:github-sync
 - กรอก `templates/standard-feedback.md`
 - ถ้าจะลงมือแก้มาตรฐาน ให้ตาม `workflows/standard-improvement.md`
 
-Feedback loop นี้เป็น product-improvement process สำหรับมาตรฐานเท่านั้น **ไม่ใช่** Employee Daily Log v5, performance review, score, KPI, daily performance หรือการประเมินบุคคล เพราะไม่ใช่ทุกทีม/ทุก role ใช้มาตรฐานนี้ และ non-dev staff อาจไม่เกี่ยวข้อง
+Feedback loop นี้เป็น product-improvement process สำหรับมาตรฐานเท่านั้น **ไม่ใช่** Daily Log, performance review, score, KPI, daily performance หรือการประเมินบุคคล เพราะไม่ใช่ทุกทีม/ทุก role ใช้มาตรฐานนี้ และ non-dev ทีม อาจไม่เกี่ยวข้อง
 
 ## Output บังคับทุก workflow/command
 

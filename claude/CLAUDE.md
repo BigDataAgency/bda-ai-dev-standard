@@ -16,13 +16,13 @@
 
 หมายเหตุ: slash commands ใช้กับ interactive Claude Code เท่านั้น; ใน print mode (`claude -p`) ให้ reference path ของ command หรือ paste เนื้อหา command แทน เพราะ `/command` จะไม่ทำงานแบบ interactive
 
-## Staff command aliases
+## Command aliases
 
-ใช้ชื่อปกติสำหรับ staff ใน Claude Code interactive เท่านั้น:
+ใช้ชื่อปกติใน Claude Code interactive เท่านั้น:
 
-- `/daily-log` → `commands/daily-log.md` → internal `commands/employee-daily-log-v5.md`
-- `/weekly-focus` → `commands/weekly-focus.md` → internal `commands/pm-weekly-focus-v2.md`
-- `/test-report` → `commands/test-report.md` → internal `commands/test-scenario-report.md`
+- `/daily-log` → `commands/daily-log.md`
+- `/weekly-focus` → `commands/weekly-focus.md`
+- `/test-report` → `commands/test-report.md` และ `commands/test-scenario-report.md`
 
 หมายเหตุ: slash commands ใช้กับ Claude Code interactive เท่านั้น; Gemini/Claude coworker ใช้ prompt commands และ Codex ใช้ agent instruction.
 
@@ -34,9 +34,9 @@
 
 ## Test Scenario Report สำหรับ QA/product evidence
 
-ใช้ `/test-report` หรือ `commands/test-report.md` เมื่อต้องการทำ test case/scenario, capture screenshot, ตรวจ console/network และสร้างรายงาน Markdown ตาม internal standard `commands/test-scenario-report.md`, `workflows/test-scenario-report.md` กับ `templates/test-scenario-report.md`
+ใช้ `/test-report` หรือ `commands/test-report.md` เมื่อต้องการทำ test case/scenario, capture screenshot, ตรวจ console/network และสร้างรายงาน Markdown ตาม standard `commands/test-scenario-report.md`, `workflows/test-scenario-report.md` กับ `templates/test-scenario-report.md`
 
-Workflow นี้ไม่ใช่ Employee Daily Log v5, performance review, score, KPI, daily performance หรือการประเมินบุคคล ให้ใช้เป็น QA/product evidence เท่านั้น
+Workflow นี้ไม่ใช่ Daily Log, performance review, score, KPI, daily performance หรือการประเมินบุคคล ให้ใช้เป็น QA/product evidence เท่านั้น
 
 สำหรับ InnoHub หรือ user-facing checks ต้องใช้ visible-menu navigation เป็น default; direct URL/hidden route ต้อง label เป็น technical verification only
 
@@ -44,7 +44,7 @@ Workflow นี้ไม่ใช่ Employee Daily Log v5, performance review, 
 
 ใช้ `/standard-feedback` หรือ `commands/standard-feedback.md` เมื่อต้องการส่ง feedback เพื่อปรับปรุง BDA AI Dev Standard เอง และอ้างอิง `FEEDBACK.md`, `templates/standard-feedback.md`, `workflows/standard-improvement.md` ตามความเหมาะสม
 
-Feedback นี้ไม่ใช่ Employee Daily Log v5, performance review, score, KPI, daily performance หรือการประเมินบุคคล ให้ใช้เพื่อปรับปรุงมาตรฐาน/command/workflow/template/Claude-Codex support เท่านั้น
+Feedback นี้ไม่ใช่ Daily Log, performance review, score, KPI, daily performance หรือการประเมินบุคคล ให้ใช้เพื่อปรับปรุงมาตรฐาน/command/workflow/template/Claude-Codex support เท่านั้น
 
 ## Output บังคับ
 

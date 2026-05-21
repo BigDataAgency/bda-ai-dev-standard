@@ -1,6 +1,6 @@
 # Staff Command: Daily Log
 
-Use `commands/daily-log.md`; map to `commands/employee-daily-log-v5.md`. Mark missing commit/link/output as pending evidence; never invent evidence.
+Use `commands/daily-log.md`. Mark missing commit/link/output as pending evidence; never invent evidence.
 
 ## How to use
 

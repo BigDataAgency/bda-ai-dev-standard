@@ -1,8 +1,8 @@
 # /weekly-focus
 
-Claude Code slash alias for staff-facing Weekly Focus.
+Claude Code slash command for Weekly Focus.
 
-ใช้ command หลัก `commands/weekly-focus.md` ซึ่ง map ไป internal canonical `commands/pm-weekly-focus-v2.md` และ `templates/pm-weekly-focus-v2.md` แล้วตอบตาม BDA AI Dev Standard เป็นภาษาไทย.
+ใช้ command หลัก `commands/weekly-focus.md` และ template `templates/weekly-focus.md` แล้วตอบตาม BDA AI Dev Standard เป็นภาษาไทย.
 
 Non-performance guardrail: Weekly Focus เป็น planning/coordination artifact เท่านั้น ไม่ใช่ performance review, score, KPI scoring, ranking, disciplinary evidence, หรือการประเมินรายบุคคล.
 

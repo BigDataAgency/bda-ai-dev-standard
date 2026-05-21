@@ -1,4 +1,4 @@
-# PM Weekly Focus v2
+# Weekly Focus
 
 ## Week
 

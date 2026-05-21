@@ -1,4 +1,4 @@
-# Employee Daily Log v5
+# Daily Log
 
 ## Date
 

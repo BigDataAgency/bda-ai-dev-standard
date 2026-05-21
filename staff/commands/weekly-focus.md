@@ -1,6 +1,6 @@
 # Staff Command: Weekly Focus
 
-Use `commands/weekly-focus.md`; map to `commands/pm-weekly-focus-v2.md`. Keep it as planning/coordination, not performance scoring.
+Use `commands/weekly-focus.md`. Keep it as planning/coordination, not performance scoring.
 
 ## How to use
 

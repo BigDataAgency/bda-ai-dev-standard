@@ -1,6 +1,6 @@
 # Test Scenario Report Template
 
-> ใช้สำหรับ QA/product evidence: test case / scenario execution พร้อม screenshot capture และ report generation เท่านั้น ไม่ใช่ Employee Daily Log v5, performance review, score, KPI หรือการประเมินบุคคล
+> ใช้สำหรับ QA/product evidence: test case / scenario execution พร้อม screenshot capture และ report generation เท่านั้น ไม่ใช่ Daily Log, performance review, score, KPI หรือการประเมินบุคคล
 
 Status summary vocabulary: Pass / Fail / Blocked / Not run (map to detailed statuses such as PASS, FAIL, BLOCKED_*, NOT_RUN as needed).
 
@@ -22,7 +22,7 @@ Status summary vocabulary: Pass / Fail / Blocked / Not run (map to detailed stat
 ## Non-performance confirmation
 
 - [ ] This report is QA/product evidence
-- [ ] This report is not Employee Daily Log v5
+- [ ] This report is not Daily Log
 - [ ] This report is not a performance review, score, KPI, daily performance, or individual evaluation
 - [ ] Role/team/account context is only for scenario reproducibility
 

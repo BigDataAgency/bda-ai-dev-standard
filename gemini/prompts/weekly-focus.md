@@ -5,8 +5,8 @@ This is a prompt command, not a Claude Code slash command.
 ## Copy/paste prompt
 
 ```text
-Use BDA AI Dev Standard v0.4.0 staff command `weekly-focus`.
-Read/reference `commands/weekly-focus.md`. Treat `commands/pm-weekly-focus-v2.md` as the internal source of truth and `templates/pm-weekly-focus-v2.md` as the output template where applicable.
+Use BDA AI Dev Standard current command `weekly-focus`.
+Read/reference `commands/weekly-focus.md`. Treat `commands/weekly-focus.md` as the source of truth and `templates/weekly-focus.md` as the output template where applicable.
 
 Guardrail: Keep this as planning/coordination only; do not create performance scores, rankings, or individual evaluation.
 

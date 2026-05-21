@@ -13,7 +13,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SANDBOX = Path("/tmp/bda-ai-dev-standard-smoke")
-EXPECTED_VERSION = "0.5.0"
+EXPECTED_VERSION = "0.6.0"
 
 REQUIRED_SECTIONS = [
     "BDA Standard files used",
@@ -28,14 +28,12 @@ SCENARIOS = {
     "bug-fix": ["commands/fix-bug.md", "workflows/bug-fix.md"],
     "review-change": ["commands/review-change.md", "workflows/code-review.md"],
     "write-document": ["commands/write-document.md", "workflows/writing-docs.md"],
-    "employee-daily-log-v5": ["commands/employee-daily-log-v5.md", "templates/daily-log-v5.md"],
-    "pm-weekly-focus-v2": ["commands/pm-weekly-focus-v2.md", "templates/pm-weekly-focus-v2.md"],
+    "daily-log": ["commands/daily-log.md", "templates/daily-log.md"],
+    "weekly-focus": ["commands/weekly-focus.md", "templates/weekly-focus.md"],
     "update-obsidian": ["commands/update-obsidian.md", "workflows/obsidian.md"],
     "performance-review": ["commands/performance-review.md", "workflows/performance.md"],
     "standard-feedback": ["commands/standard-feedback.md", "templates/standard-feedback.md", "workflows/standard-improvement.md", "FEEDBACK.md"],
     "test-scenario-report": ["commands/test-scenario-report.md", "templates/test-scenario-report.md", "workflows/test-scenario-report.md"],
-    "daily-log": ["commands/daily-log.md", "templates/daily-log-v5.md"],
-    "weekly-focus": ["commands/weekly-focus.md", "templates/pm-weekly-focus-v2.md"],
     "test-report": ["commands/test-report.md", "templates/test-scenario-report.md", "workflows/test-scenario-report.md"],
 }
 
@@ -60,29 +58,28 @@ CLAUDE_COMMANDS = [
     "claude/commands/test-report.md",
 ]
 
-STAFF_COMMAND_PACK = {
+COMMAND_PACK = {
     "daily-log": {
         "command": "commands/daily-log.md",
         "claude": "claude/commands/daily-log.md",
-        "legacy": "commands/employee-daily-log-v5.md",
-        "terms": ["Daily Log", "Daily Log v5", "AI usage", "tomorrow focus"],
+        "template": "templates/daily-log.md",
+        "terms": ["Daily Log", "AI usage", "tomorrow focus"],
     },
     "weekly-focus": {
         "command": "commands/weekly-focus.md",
         "claude": "claude/commands/weekly-focus.md",
-        "legacy": "commands/pm-weekly-focus-v2.md",
-        "terms": ["Weekly Focus", "weekly focus v2", "priorities", "committed", "stretch"],
+        "terms": ["Weekly Focus", "weekly focus", "priorities", "committed", "stretch"],
+        "template": "templates/weekly-focus.md",
     },
     "test-report": {
         "command": "commands/test-report.md",
         "claude": "claude/commands/test-report.md",
-        "legacy": "commands/test-scenario-report.md",
+        "template": "templates/test-scenario-report.md",
         "terms": ["Test Report", "QA/product evidence", "screenshot", "test matrix", "expected", "actual"],
     },
 }
 
-# Optional staff adapters: if these files are added by the v0.4.0 implementation,
-# validate that they expose the normal staff command names rather than v5/v2 names.
+# Optional adapters: when present, they must point users at normal command names.
 OPTIONAL_STAFF_ADAPTER_GLOBS = [
     "staff/**/*.md",
     "gemini/**/*.md",
@@ -186,13 +183,26 @@ def validate_obsidian_init_workflow() -> None:
     assert_contains_all("templates/obsidian-work-note.md", ["Testcase / Evidence", "Obsidian updates"])
 
 
-def validate_staff_command_pack() -> None:
-    for name, spec in STAFF_COMMAND_PACK.items():
-        assert_contains_all(spec["command"], [*REQUIRED_SECTIONS, *spec["terms"], spec["legacy"]])
+LEGACY_REMOVED_TERMS = [
+    "employee-daily-log-" + "v" + "5",
+    "pm-weekly-focus-" + "v" + "2",
+    "daily-log-" + "v" + "5",
+    "weekly-focus-" + "v" + "2",
+    "Employee Daily Log " + "v" + "5",
+    "PM Weekly Focus " + "v" + "2",
+    "Employee " + "v" + "5",
+    "PM " + "v" + "2",
+    "Daily Log " + "v" + "5",
+    "weekly focus " + "v" + "2",
+    "stand" + "alone",
+]
+
+
+def validate_command_pack() -> None:
+    for name, spec in COMMAND_PACK.items():
+        assert_contains_all(spec["command"], [*REQUIRED_SECTIONS, *spec["terms"], spec["template"]])
         assert_contains_all(spec["claude"], [f"/{name}", spec["command"], *REQUIRED_SECTIONS])
 
-    # User-facing docs should advertise normal command names. Legacy v5/v2 names
-    # may remain as implementation/template details, but not as primary slash commands.
     for rel in ["README.md", "claude/CLAUDE.md"]:
         assert_contains_all(
             rel,
@@ -205,33 +215,44 @@ def validate_staff_command_pack() -> None:
                 "/test-report",
             ],
         )
-        text = read(rel)
-        forbidden = [r"(?<![A-Za-z0-9_.-])/employee-daily-log-v5", r"(?<![A-Za-z0-9_.-])/pm-weekly-focus-v2", r"(?<![A-Za-z0-9_.-])/test-scenario-report"]
-        found = [pattern for pattern in forbidden if re.search(pattern, text)]
-        if found:
-            raise AssertionError(f"{rel} exposes legacy/versioned slash command names: {found}")
 
 
-def validate_optional_staff_adapters() -> None:
+def validate_optional_adapters() -> None:
     adapter_paths: list[Path] = []
     for pattern in OPTIONAL_STAFF_ADAPTER_GLOBS:
         adapter_paths.extend(ROOT.glob(pattern))
 
-    # The v0.4.0 pack may add staff/gemini/claude-coworker prompt files; when
-    # present, they must point staff users at normal command names. Internal
-    # source-of-truth paths may still mention the legacy canonical files.
     for path in sorted(set(adapter_paths)):
         rel = str(path.relative_to(ROOT))
         if path.name == "README.md":
             assert_contains_all(rel, ["daily-log", "weekly-focus", "test-report"])
-        elif path.stem in STAFF_COMMAND_PACK:
-            assert_contains_all(rel, [path.stem, STAFF_COMMAND_PACK[path.stem]["command"]])
+        elif path.stem in COMMAND_PACK:
+            assert_contains_all(rel, [path.stem, COMMAND_PACK[path.stem]["command"]])
 
-        text = read(rel)
-        forbidden_slash = [r"(?<![A-Za-z0-9_.-])/employee-daily-log-v5", r"(?<![A-Za-z0-9_.-])/pm-weekly-focus-v2", r"(?<![A-Za-z0-9_.-])/test-scenario-report"]
-        found = [pattern for pattern in forbidden_slash if re.search(pattern, text)]
+
+def validate_legacy_staff_versioning_removed() -> None:
+    removed_files = [
+        "commands/employee-daily-log-" + "v" + "5.md",
+        "commands/pm-weekly-focus-" + "v" + "2.md",
+        "templates/daily-log-" + "v" + "5.md",
+        "templates/pm-weekly-focus-" + "v" + "2.md",
+        "claude/commands/employee-daily-log-" + "v" + "5.md",
+        "claude/commands/pm-weekly-focus-" + "v" + "2.md",
+    ]
+    existing = [rel for rel in removed_files if (ROOT / rel).exists()]
+    if existing:
+        raise AssertionError(f"legacy versioned files still exist: {existing}")
+
+    for path in ROOT.glob("**/*"):
+        if not path.is_file() or ".git" in path.parts:
+            continue
+        if path.suffix not in {".md", ".py", ".toml", ".json", ".txt"} and path.name not in {"VERSION"}:
+            continue
+        rel = str(path.relative_to(ROOT))
+        text = path.read_text(encoding="utf-8")
+        found = [term for term in LEGACY_REMOVED_TERMS if term in text]
         if found:
-            raise AssertionError(f"{rel} exposes legacy/versioned slash command names: {found}")
+            raise AssertionError(f"{rel} still contains removed legacy terms: {found}")
 
 
 def validate_standard_feedback_loop() -> None:
@@ -244,7 +265,7 @@ def validate_standard_feedback_loop() -> None:
     ]
     required_terms = [
         "BDA AI Dev Standard",
-        "Employee Daily Log v5",
+        "Daily Log",
         "performance",
         "ไม่ใช่",
     ]
@@ -293,7 +314,7 @@ def validate_test_scenario_report_workflow() -> None:
         "recommendations",
         "visible-menu navigation",
         "technical verification only",
-        "Employee Daily Log v5",
+        "Daily Log",
         "performance",
     ]
     for rel in scenario_files:
@@ -384,8 +405,9 @@ def main() -> int:
         validate_version_consistency,
         validate_required_sections,
         validate_claude_usage_docs,
-        validate_staff_command_pack,
-        validate_optional_staff_adapters,
+        validate_command_pack,
+        validate_optional_adapters,
+        validate_legacy_staff_versioning_removed,
         validate_obsidian_init_workflow,
         validate_standard_feedback_loop,
         validate_test_scenario_report_workflow,

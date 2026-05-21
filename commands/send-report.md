@@ -1,6 +1,6 @@
 # Command: Send Report
 
-Staff-facing command for safely converting or sending a BDA AI Dev Test Report / test-scenario-report to InnoHub using the standalone SOP `docs/staff-report-sender-sop.md`.
+Command for safely converting or sending a BDA AI Dev Test Report / test-scenario-report to InnoHub using the SOP `docs/staff-report-sender-sop.md`.
 
 ## ใช้เมื่อ
 
@@ -56,4 +56,4 @@ Output ที่ต้องส่งต้องมีหัวข้อ: BDA S
 5. **Limitations / Risks / Next steps** — ข้อจำกัด ความเสี่ยง และสิ่งที่ต้องตามต่อ เช่น owner verification หรือ credential setup
 
 ---
-ใช้ `send-report` เป็นชื่อปกติสำหรับ staff; รายละเอียดการใช้งานและ troubleshooting อยู่ใน `docs/staff-report-sender-sop.md`.
+ใช้ `send-report` เป็นชื่อปกติสำหรับทีม; รายละเอียดการใช้งานและ troubleshooting อยู่ใน `docs/staff-report-sender-sop.md`.

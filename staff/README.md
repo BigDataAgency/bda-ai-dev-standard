@@ -1,12 +1,12 @@
-# Staff Command Pack — BDA AI Dev Standard v0.4.0
+# Staff Command Pack — BDA AI Dev Standard
 
-Staff should use normal command names without internal version suffixes.
+Staff should use normal command names without legacy version suffixes.
 
 ## Commands
 
-- `daily-log` — daily work summary with evidence; internal source `employee-daily-log-v5`
-- `weekly-focus` — weekly planning/focus; internal source `pm-weekly-focus-v2`
-- `test-report` — QA/product test evidence; internal source `test-scenario-report`
+- `daily-log` — daily work summary with evidence
+- `weekly-focus` — weekly planning/focus
+- `test-report` — QA/product test evidence
 
 ## Adapter usage
 
@@ -23,4 +23,4 @@ Staff should use normal command names without internal version suffixes.
 
 ## Required BDA output sections
 
-Every staff command output must include: BDA Standard files used, Pipeline trace, Commands run, Verification / Evidence, Limitations / Risks / Next steps.
+Every command output must include: BDA Standard files used, Pipeline trace, Commands run, Verification / Evidence, Limitations / Risks / Next steps.

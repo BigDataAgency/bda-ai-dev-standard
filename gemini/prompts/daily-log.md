@@ -5,8 +5,8 @@ This is a prompt command, not a Claude Code slash command.
 ## Copy/paste prompt
 
 ```text
-Use BDA AI Dev Standard v0.4.0 staff command `daily-log`.
-Read/reference `commands/daily-log.md`. Treat `commands/employee-daily-log-v5.md` as the internal source of truth and `templates/daily-log-v5.md` as the output template where applicable.
+Use BDA AI Dev Standard current command `daily-log`.
+Read/reference `commands/daily-log.md`. Treat `commands/daily-log.md` as the source of truth and `templates/daily-log.md` as the output template where applicable.
 
 Guardrail: Mark missing commit/link/output/test/log/screenshot/token/cost as pending evidence; do not invent evidence.
 

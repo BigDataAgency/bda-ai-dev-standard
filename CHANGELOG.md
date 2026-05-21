@@ -8,6 +8,23 @@ This project uses Semantic Versioning: `MAJOR.MINOR.PATCH`.
 - MINOR: new commands, workflows, templates, adapters, or substantial behavior improvements
 - PATCH: clarifications, typo fixes, safer wording, and non-breaking documentation updates
 
+## [0.6.0] - 2026-05-21
+
+### Removed
+
+- Removed legacy versioned daily/weekly command files and Claude adapters.
+- Removed legacy daily/weekly template filenames and replaced them with normal template names:
+  - `templates/daily-log.md`
+  - `templates/weekly-focus.md`
+- Removed legacy self-contained wording from report-sender command docs.
+
+### Changed
+
+- `daily-log` and `weekly-focus` are now direct canonical commands, not aliases to versioned internal commands.
+- Updated README, AI, Claude, Codex, staff, Gemini, and Claude coworker docs to reference only normal command names.
+- Updated smoke validation to fail if removed legacy daily/weekly terms or files return.
+- Updated current version metadata to `0.6.0`.
+
 ## [0.5.0] - 2026-05-21
 
 ### Added
@@ -43,18 +60,18 @@ This project uses Semantic Versioning: `MAJOR.MINOR.PATCH`.
 
 ### Added
 
-- Staff command pack with normal, non-versioned command names:
-  - `commands/daily-log.md` maps to internal `commands/employee-daily-log-v5.md`.
-  - `commands/weekly-focus.md` maps to internal `commands/pm-weekly-focus-v2.md`.
-  - `commands/test-report.md` maps to internal QA/product evidence standard `commands/test-scenario-report.md`.
+- Command pack with normal, non-versioned command names:
+  - `commands/daily-log.md`
+  - `commands/weekly-focus.md`
+  - `commands/test-report.md`
 - Claude Code slash aliases: `/daily-log`, `/weekly-focus`, `/test-report`.
 - Staff documentation under `staff/commands/` and adapter prompt packs for Gemini and Claude coworker.
-- Codex/Claude/general AI docs now describe staff command aliases and adapter-specific usage.
+- Codex/Claude/general AI docs now describe command aliases and adapter-specific usage.
 
 ### Changed
 
 - Updated current version metadata to `0.4.0`.
-- Kept canonical versioned standards internal while exposing staff-friendly aliases.
+- Added friendly aliases for daily, weekly, and test report workflows.
 
 ### Guardrails
 
@@ -86,7 +103,7 @@ This project uses Semantic Versioning: `MAJOR.MINOR.PATCH`.
 
 ### Notes
 
-- This workflow is explicitly separate from Employee Daily Log v5 and performance evaluation.
+- This workflow is explicitly separate from Daily Log and performance evaluation.
 - User-facing checks, including InnoHub scenarios, should use visible-menu navigation by default; hidden/direct routes must be labeled technical verification only.
 
 ## [0.1.0] - 2026-05-17
@@ -105,8 +122,8 @@ Initial public release.
   - writing and documents
   - Obsidian updates
   - performance review
-  - Employee Daily Log v5
-  - PM Weekly Focus v2
+  - Daily Log
+  - Weekly Focus
 - Codex adapter: `codex/AGENTS.md`
 - Claude adapter and slash-command files: `claude/CLAUDE.md`, `claude/commands/*.md`
 - Required reporting trace for every standard-driven task:
@@ -115,7 +132,7 @@ Initial public release.
   - Commands run
   - Verification / Evidence
   - Limitations / Risks / Next steps
-- Feedback loop for improving the standard, separate from Employee v5 and performance evaluation:
+- Feedback loop for improving the standard, separate from Daily Log and performance evaluation:
   - `FEEDBACK.md`
   - `commands/standard-feedback.md`
   - `templates/standard-feedback.md`

@@ -1,6 +1,6 @@
 # Command: Test Report
 
-Staff-facing alias for the QA/product evidence standard `commands/test-scenario-report.md`, `workflows/test-scenario-report.md`, and `templates/test-scenario-report.md`.
+User-facing QA/product evidence command that wraps `commands/test-scenario-report.md`, `workflows/test-scenario-report.md`, and `templates/test-scenario-report.md`.
 
 ## ใช้เมื่อ
 
@@ -9,7 +9,7 @@ Staff-facing alias for the QA/product evidence standard `commands/test-scenario-
 ## Mapping
 
 - Staff command name: `test-report`
-- Internal source of truth: `commands/test-scenario-report.md`
+- Detailed command: `commands/test-scenario-report.md`
 - Workflow: `workflows/test-scenario-report.md`
 - Template: `templates/test-scenario-report.md`
 - Claude Code slash alias: `/test-report` จาก `claude/commands/test-report.md`
@@ -18,7 +18,7 @@ Staff-facing alias for the QA/product evidence standard `commands/test-scenario-
 
 Command นี้ใช้ตรวจคุณภาพ product/scenario เท่านั้น:
 
-- ไม่ใช่ Employee Daily Log v5
+- ไม่ใช่ Daily Log
 - ไม่ใช่ performance review, score, KPI, daily performance หรือการประเมินบุคคล
 - ห้ามใช้ผลรายงานนี้เป็นหลักฐานประเมินรายบุคคลโดยตรง
 - ถ้าระบุ role/team ให้ใช้เพื่อเข้าใจ testing context เท่านั้น
@@ -29,8 +29,8 @@ Command นี้ใช้ตรวจคุณภาพ product/scenario เท
 ทำงาน: Test Report สำหรับ QA/product evidence
 Context: <วาง URL/environment, role/account type, scenario list หรือ acceptance criteria, constraints, output folder ที่ต้องการ>
 โปรดทำตามขั้นตอนนี้:
-1. อ่าน `commands/test-report.md`, internal standard `commands/test-scenario-report.md`, `workflows/test-scenario-report.md`, และ `templates/test-scenario-report.md`
-2. ยืนยัน scope ว่าเป็น QA/product evidence ไม่ใช่ Employee Daily Log v5 หรือ performance evaluation
+1. อ่าน `commands/test-report.md`, standard `commands/test-scenario-report.md`, `workflows/test-scenario-report.md`, และ `templates/test-scenario-report.md`
+2. ยืนยัน scope ว่าเป็น QA/product evidence ไม่ใช่ Daily Log หรือ performance evaluation
 3. ถ้าเป็น production ให้ทำ Production Read-only Guardrail Checklist ก่อน execute: ห้าม create/edit/delete/approve/reject/upload/import/export/download sensitive docs เว้นแต่ระบุใน scope และได้รับอนุญาตชัดเจน
 4. ระบุ test account classification โดยไม่ใส่ credentials: real user / synthetic test account / impersonation / limited-role / no credentials และระบุ role/permission เท่าที่ใช้ตรวจ
 5. สร้าง test matrix: scenario ID, priority, role/account class, route source trace, entry point, steps, expected result, screenshot checkpoints, no-mutation criteria
@@ -53,7 +53,7 @@ Output ที่ต้องส่งต้องมีหัวข้อ: BDA S
 
 ## Checklist
 
-- [ ] Scope เป็น QA/product evidence ไม่ใช่ Employee v5/performance
+- [ ] Scope เป็น QA/product evidence ไม่ใช่ Daily Log/performance
 - [ ] ระบุ URL/environment/build/version/commit ถ้ามี
 - [ ] ถ้าเป็น production ให้ยืนยัน read-only/no-mutation guardrail ก่อน execute
 - [ ] ระบุ role/account type และ test account classification โดยไม่เปิดเผย secret/credential
@@ -76,4 +76,4 @@ Output ที่ต้องส่งต้องมีหัวข้อ: BDA S
 5. **Limitations / Risks / Next steps** — ข้อจำกัด ความเสี่ยง สิ่งที่ยังไม่ได้ตรวจ หรือขั้นตอนถัดไป
 
 ---
-ใช้ `test-report` เป็นชื่อปกติสำหรับ staff; เก็บ `test-scenario-report` เป็น internal QA/product evidence standard.
+ใช้ `test-report` เป็นชื่อปกติสำหรับทีม; `test-scenario-report` เป็น detailed QA/product evidence command.

@@ -15,13 +15,13 @@
 - เมื่อทำงานเสร็จให้อัปเดต session/evidence note ตาม `templates/obsidian-work-note.md` ถ้า write scope อนุญาต
 - ห้ามสร้าง testcase/evidence ปลอม; ถ้าไม่ได้ตรวจจริงให้เขียน `pending evidence` หรือ `not available`
 
-## Staff command pack v0.4.0
+## Command Pack
 
-Codex uses this file as agent instruction; it does not use Claude Code slash commands. When asked for staff commands, reference normal command names:
+Codex uses this file as agent instruction; it does not use Claude Code slash commands. When asked for commands, reference normal command names:
 
-- `daily-log` → `commands/daily-log.md` → internal `commands/employee-daily-log-v5.md`; mark missing commit/link/output as pending evidence.
-- `weekly-focus` → `commands/weekly-focus.md` → internal `commands/pm-weekly-focus-v2.md`; do not turn planning into performance scoring.
-- `test-report` → `commands/test-report.md` → internal `commands/test-scenario-report.md`; QA/product evidence only, not individual evaluation.
+- `daily-log` → `commands/daily-log.md`; mark missing commit/link/output as pending evidence.
+- `weekly-focus` → `commands/weekly-focus.md`; do not turn planning into performance scoring.
+- `test-report` → `commands/test-report.md` and `commands/test-scenario-report.md`; QA/product evidence only, not individual evaluation.
 
 ## Working rules
 

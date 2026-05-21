@@ -5,10 +5,10 @@ This is a prompt command, not a Claude Code slash command.
 ## Copy/paste prompt
 
 ```text
-Use BDA AI Dev Standard v0.4.0 staff command `test-report`.
-Read/reference `commands/test-report.md`. Treat `commands/test-scenario-report.md` as the internal source of truth and `templates/test-scenario-report.md` as the output template where applicable.
+Use BDA AI Dev Standard current command `test-report`.
+Read/reference `commands/test-report.md`. Treat `commands/test-scenario-report.md` as the source of truth and `templates/test-scenario-report.md` as the output template where applicable.
 
-Guardrail: Use QA/product evidence behavior from the internal test-scenario-report standard; not performance evaluation.
+Guardrail: Use QA/product evidence behavior from the test-scenario-report standard; not performance evaluation.
 
 Context:
 <วาง context งานจริงที่นี่>
