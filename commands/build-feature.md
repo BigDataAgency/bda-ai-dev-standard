@@ -9,23 +9,27 @@
 ทำงาน: Build Feature
 Context: <วาง task/ไฟล์/ลิงก์/ข้อจำกัด>
 โปรดทำตามขั้นตอนนี้:
-1. ยืนยัน expected behavior
-2. สำรวจ pattern เดิม
-3. implement แบบ minimal
-4. เพิ่ม/ปรับ test ถ้าเหมาะสม
-5. verify build/test/manual
+1. ถ้ามี Obsidian context manifest (`00-Agent-Context.md` หรือ `.bda/obsidian-context.md`) ให้อ่านก่อนเริ่ม และเตรียม session/evidence note ตาม context; ถ้าไม่มีและงานต้องผูกกับ Obsidian ให้ใช้ `commands/init.md`
+2. ยืนยัน expected behavior
+3. สำรวจ pattern เดิม
+4. implement แบบ minimal
+5. เพิ่ม/ปรับ test ถ้าเหมาะสม
+6. verify build/test/manual
+7. อัปเดต Obsidian session/evidence note ด้วย feature summary, files changed, testcase/evidence, commands run, และข้อจำกัด ถ้ามี context
 
-Output ที่ต้องส่ง: feature summary พร้อม files และ evidence
+Output ที่ต้องส่ง: feature summary พร้อม files, evidence, และ Obsidian note ที่อัปเดตถ้ามี context
 
 Output ที่ต้องส่งต้องมีหัวข้อ: BDA Standard files used, Pipeline trace, Commands run, Verification / Evidence, Limitations / Risks / Next steps
 ```
 
 ## Checklist
+- [ ] อ่าน Obsidian context manifest ถ้ามี หรือระบุว่าไม่มี context
 - [ ] ยืนยัน expected behavior
 - [ ] สำรวจ pattern เดิม
 - [ ] implement แบบ minimal
 - [ ] เพิ่ม/ปรับ test ถ้าเหมาะสม
 - [ ] verify build/test/manual
+- [ ] อัปเดต session/evidence note หรือระบุเหตุผลที่ไม่ได้อัปเดต
 
 ## Required report sections
 

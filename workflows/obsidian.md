@@ -1,18 +1,33 @@
 # Workflow: obsidian
 
-Obsidian: รักษา link graph, tags, frontmatter, naming, ห้ามแตะ shared vault โดยไม่ยืนยัน
+Obsidian: รักษา link graph, tags, frontmatter, naming, ห้ามแตะ shared vault โดยไม่ยืนยัน และใช้ `commands/init.md` เพื่อสร้าง context manifest ก่อนให้ command อื่นทำงานร่วมกับ vault
 
 ## Steps
 1. ใช้ `commands/understand-task.md`
-2. ใช้ `commands/plan-work.md` ถ้างานไม่เล็กมาก
-3. ทำงานด้วย command ที่ใกล้ที่สุด
-4. ใช้ `commands/verify-work.md`
-5. ส่ง `commands/handoff-report.md`
+2. ถ้ายังไม่มี Obsidian context manifest ให้ใช้ `commands/init.md` เพื่อสร้าง/อัปเดต `00-Agent-Context.md`, `sessions/_index.md`, และ `test-evidence/_index.md`
+3. ใช้ `commands/plan-work.md` ถ้างานไม่เล็กมาก โดยอ้างอิง session/evidence note จาก manifest
+4. ทำงานด้วย command ที่ใกล้ที่สุด เช่น `commands/fix-bug.md`, `commands/build-feature.md`, `commands/write-document.md`, หรือ `commands/test-report.md`
+5. อัปเดต Obsidian session/evidence/index notes ระหว่างหรือท้ายงาน ไม่ต้องรอให้ user สั่งเก็บเพิ่มอีกครั้งถ้ามี context แล้ว
+6. ใช้ `commands/verify-work.md`
+7. ส่ง `commands/handoff-report.md`
+
+## Context manifest
+
+ค่า default ใน project folder:
+
+- `00-Agent-Context.md`: แผนที่โครงสร้าง vault/project และกติกา link/tag/frontmatter
+- `sessions/_index.md`: index งาน AI และ work notes
+- `sessions/YYYY-MM-DD-<slug>.md`: note ต่องาน
+- `test-evidence/_index.md`: index testcase/evidence
+- `test-evidence/YYYY-MM-DD-<slug>.md`: note ต่อรอบตรวจ
+
+ถ้า source repo แยกจาก Obsidian vault และ user อนุญาต ให้เพิ่ม `.bda/obsidian-context.md` ใน repo เพื่อชี้กลับไปยัง manifest.
 
 ## Evidence
 - command ที่รัน
 - result/log/screenshot/link
 - files changed
+- session/evidence note ที่สร้างหรืออัปเดต
 - known limitations
 
 

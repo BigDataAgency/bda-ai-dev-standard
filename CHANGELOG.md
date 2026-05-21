@@ -8,6 +8,21 @@ This project uses Semantic Versioning: `MAJOR.MINOR.PATCH`.
 - MINOR: new commands, workflows, templates, adapters, or substantial behavior improvements
 - PATCH: clarifications, typo fixes, safer wording, and non-breaking documentation updates
 
+## [0.5.0] - 2026-05-21
+
+### Added
+
+- `commands/init.md` for initializing Obsidian/project context before running normal work commands.
+- `templates/obsidian-context.md` as the canonical context manifest template.
+- `templates/obsidian-work-note.md` for session notes and testcase/evidence notes.
+- Claude Code slash adapter `claude/commands/init.md`.
+
+### Changed
+
+- `plan-work`, `fix-bug`, `build-feature`, `write-document`, and `update-obsidian` now read Obsidian context when present and update session/evidence notes by default.
+- `workflows/obsidian.md`, `AI-README.md`, `README.md`, `claude/CLAUDE.md`, and `codex/AGENTS.md` now document the init-to-context flow.
+- Updated current version metadata to `0.5.0`.
+
 ## [0.4.1] - 2026-05-18
 
 ### Added

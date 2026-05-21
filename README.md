@@ -1,6 +1,6 @@
 # BDA AI Dev Standard
 
-Version: `0.4.1`
+Version: `0.5.0`
 License: MIT
 
 มาตรฐานกลางสำหรับการทำงานร่วมกับ AI ในงานพัฒนา ซ่อมบั๊ก ตรวจโค้ด เขียนเอกสาร งาน Obsidian งาน Performance และงานติดตามทีมของ BDA
@@ -11,7 +11,7 @@ License: MIT
 
 BDA AI Dev Standard ใช้ Semantic Versioning: `MAJOR.MINOR.PATCH`
 
-- Current version: `0.4.1`
+- Current version: `0.5.0`
 - ดูประวัติการเปลี่ยนแปลงที่ `CHANGELOG.md`
 - เลข version หลักอยู่ใน `VERSION`
 - ทุก update สำคัญต้องเปลี่ยน version ใน repo นี้ก่อน rollout
@@ -21,11 +21,12 @@ BDA AI Dev Standard ใช้ Semantic Versioning: `MAJOR.MINOR.PATCH`
 > **Public repo security notice:** repo นี้เป็น standards/templates/prompts/schemas แบบ public เท่านั้น ห้าม hardcode BDA/InnoHub production endpoints, credentials, tokens, tenant secrets, privileged database keys, หรือข้อมูลลูกค้าใน repo นี้ ค่า default ต้องเป็น local-output mode (`BDA_STANDARD_MODE=local`) และห้าม auto-ingest เข้า InnoHub โดย default ให้ใช้ `localhost` หรือ `example.com` เป็น placeholder เท่านั้น Production ingest ต้องผ่าน private connector พร้อม auth/tenant validation ตาม `SECURITY.md` และ `docs/public-ingest-guardrails.md`
 
 1. เปิดงานด้วย `commands/understand-task.md`
-2. เลือก workflow ตามประเภทงานใน `workflows/`
-3. ให้ AI วางแผนด้วย `commands/plan-work.md`
-4. ให้ AI ทำงานตาม command เฉพาะ เช่น `build-feature`, `fix-bug`, `write-document`
-5. ตรวจหลักฐานด้วย `commands/verify-work.md` และ policy ใน `policies/`
-6. ส่ง handoff ด้วย `commands/handoff-report.md`
+2. ถ้างานต้องทำร่วมกับ Obsidian ให้ใช้ `commands/init.md` หนึ่งครั้งเพื่อสร้าง context manifest
+3. เลือก workflow ตามประเภทงานใน `workflows/`
+4. ให้ AI วางแผนด้วย `commands/plan-work.md`
+5. ให้ AI ทำงานตาม command เฉพาะ เช่น `build-feature`, `fix-bug`, `write-document`
+6. ตรวจหลักฐานด้วย `commands/verify-work.md` และ policy ใน `policies/`
+7. ส่ง handoff ด้วย `commands/handoff-report.md`
 
 ## เลือกตามขนาดงาน
 
@@ -40,6 +41,7 @@ BDA AI Dev Standard ใช้ Semantic Versioning: `MAJOR.MINOR.PATCH`
 - แก้บั๊ก: `commands/fix-bug.md`
 - Code Review: `commands/review-change.md`
 - เช็กแอปจริง: `commands/check-real-app.md`
+- Init Obsidian/project context: `commands/init.md`
 - รายงาน test scenario พร้อม screenshot: `commands/test-report.md` (alias ของ `commands/test-scenario-report.md`)
 - ส่งรายงานเข้า InnoHub แบบปลอดภัย: `commands/send-report.md` และ `docs/staff-report-sender-sop.md`
 - Sync รายงานจาก GitHub/KitHub เข้า InnoHub แบบ transition-safe: `docs/github-to-innohub-sync-sop.md`
@@ -61,7 +63,7 @@ BDA AI Dev Standard ใช้ Semantic Versioning: `MAJOR.MINOR.PATCH`
 
 ใช้ `/` command ใน Claude Code ได้เมื่อ copy/ติดตั้งไฟล์จาก `claude/commands/*.md` ไปไว้ใน `.claude/commands/` ของ target repo และ copy `claude/CLAUDE.md` ไปเป็น `CLAUDE.md` ที่ root ของ target repo แล้ว
 
-- Interactive Claude Code: เรียกได้ เช่น `/fix-bug`, `/review-change`, `/build-feature`, `/write-document`, `/standard-feedback`, `/daily-log`, `/weekly-focus`, `/test-report`
+- Interactive Claude Code: เรียกได้ เช่น `/init`, `/fix-bug`, `/review-change`, `/build-feature`, `/write-document`, `/standard-feedback`, `/daily-log`, `/weekly-focus`, `/test-report`
 - Print mode (`claude -p`): slash command แบบ interactive จะไม่ถูกรันโดยตรง ให้ reference ไฟล์ command (`commands/fix-bug.md`) หรือ paste prompt จาก command แทน
 
 
@@ -81,6 +83,19 @@ Adapter usage:
 - Codex: use `codex/AGENTS.md` as agent instruction and reference the staff command files by path.
 
 These aliases keep canonical/versioned standards internal so staff do not need to remember `v5` or `v2` names.
+
+## Obsidian init context workflow
+
+ใช้ `commands/init.md` เมื่ออยากให้ AI รู้จักโครงสร้าง Obsidian/project ก่อนทำงานต่อด้วย `plan-work`, `fix-bug`, `build-feature`, `write-document`, `test-report`, หรือ `update-obsidian`.
+
+สิ่งที่ init สร้าง/อัปเดตใน project folder ที่ยืนยันแล้ว:
+
+- `00-Agent-Context.md` จาก `templates/obsidian-context.md` เป็น canonical context manifest
+- `sessions/_index.md` และ `sessions/YYYY-MM-DD-<slug>.md` สำหรับ work notes
+- `test-evidence/_index.md` และ `test-evidence/YYYY-MM-DD-<slug>.md` สำหรับ testcase/evidence
+- `.bda/obsidian-context.md` ใน source repo เฉพาะเมื่อ user อนุญาต เพื่อชี้กลับไปยัง Obsidian manifest
+
+หลังมี manifest แล้ว command งานหลักจะอ่าน context นี้ก่อนทำงาน และอัปเดต session/evidence note เป็น default โดยยังต้องยึด no fake evidence: ไม่มีผลตรวจจริงให้ระบุ `pending evidence`.
 
 ## QA/Product evidence workflow
 

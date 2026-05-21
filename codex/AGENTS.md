@@ -6,6 +6,14 @@
 
 - ถ้า repo เป้าหมายมี `AI-README.md` ให้ใช้ไฟล์นั้นเป็น entrypoint เพิ่มเติม
 - ถ้าไม่มี `AI-README.md` ให้ทำตามกติกาในไฟล์นี้ได้ทันที ห้ามหยุดงานเพราะหา entrypoint ไม่เจอ
+- ถ้างานผูกกับ Obsidian ให้หา `00-Agent-Context.md` หรือ `.bda/obsidian-context.md`; ถ้าไม่มีและต้องใช้ context ให้ทำตาม `commands/init.md`
+
+## Obsidian context
+
+- ใช้ `commands/init.md` เพื่อสำรวจ vault/project และสร้าง `00-Agent-Context.md` จาก `templates/obsidian-context.md`
+- หลังมี context แล้ว `plan-work`, `fix-bug`, `build-feature`, `write-document`, `test-report`, และ `update-obsidian` ต้องอ่าน manifest ก่อนทำงาน
+- เมื่อทำงานเสร็จให้อัปเดต session/evidence note ตาม `templates/obsidian-work-note.md` ถ้า write scope อนุญาต
+- ห้ามสร้าง testcase/evidence ปลอม; ถ้าไม่ได้ตรวจจริงให้เขียน `pending evidence` หรือ `not available`
 
 ## Staff command pack v0.4.0
 

@@ -13,7 +13,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SANDBOX = Path("/tmp/bda-ai-dev-standard-smoke")
-EXPECTED_VERSION = "0.4.1"
+EXPECTED_VERSION = "0.5.0"
 
 REQUIRED_SECTIONS = [
     "BDA Standard files used",
@@ -24,6 +24,7 @@ REQUIRED_SECTIONS = [
 ]
 
 SCENARIOS = {
+    "init": ["commands/init.md", "templates/obsidian-context.md", "templates/obsidian-work-note.md", "workflows/obsidian.md"],
     "bug-fix": ["commands/fix-bug.md", "workflows/bug-fix.md"],
     "review-change": ["commands/review-change.md", "workflows/code-review.md"],
     "write-document": ["commands/write-document.md", "workflows/writing-docs.md"],
@@ -46,6 +47,7 @@ GLOBAL_FILES = [
 ]
 
 CLAUDE_COMMANDS = [
+    "claude/commands/init.md",
     "claude/commands/fix-bug.md",
     "claude/commands/review-change.md",
     "claude/commands/build-feature.md",
@@ -138,6 +140,7 @@ def validate_claude_usage_docs() -> None:
                 ".claude/commands/",
                 "interactive",
                 "claude -p",
+                "/init",
                 "/fix-bug",
                 "/review-change",
                 "/standard-feedback",
@@ -146,6 +149,41 @@ def validate_claude_usage_docs() -> None:
                 "/test-report",
             ],
         )
+
+
+def validate_obsidian_init_workflow() -> None:
+    init_files = [
+        "commands/init.md",
+        "templates/obsidian-context.md",
+        "templates/obsidian-work-note.md",
+        "workflows/obsidian.md",
+        "claude/commands/init.md",
+    ]
+    required_terms = [
+        "00-Agent-Context.md",
+        "sessions/_index.md",
+        "test-evidence/_index.md",
+        "Obsidian context manifest",
+        "pending evidence",
+    ]
+    for rel in ["commands/init.md", "workflows/obsidian.md", "claude/commands/init.md"]:
+        assert_contains_all(rel, [*REQUIRED_SECTIONS, "00-Agent-Context.md"])
+
+    for rel in [
+        "README.md",
+        "AI-README.md",
+        "claude/CLAUDE.md",
+        "codex/AGENTS.md",
+        "commands/plan-work.md",
+        "commands/fix-bug.md",
+        "commands/build-feature.md",
+        "commands/write-document.md",
+        "commands/update-obsidian.md",
+    ]:
+        assert_contains_all(rel, ["commands/init.md", "00-Agent-Context.md"])
+
+    assert_contains_all("templates/obsidian-context.md", required_terms[:4])
+    assert_contains_all("templates/obsidian-work-note.md", ["Testcase / Evidence", "Obsidian updates"])
 
 
 def validate_staff_command_pack() -> None:
@@ -348,6 +386,7 @@ def main() -> int:
         validate_claude_usage_docs,
         validate_staff_command_pack,
         validate_optional_staff_adapters,
+        validate_obsidian_init_workflow,
         validate_standard_feedback_loop,
         validate_test_scenario_report_workflow,
         validate_scenario_templates,

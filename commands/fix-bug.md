@@ -9,23 +9,27 @@
 ทำงาน: Fix Bug
 Context: <วาง task/ไฟล์/ลิงก์/ข้อจำกัด>
 โปรดทำตามขั้นตอนนี้:
-1. reproduce หรืออธิบายเหตุที่ reproduce ไม่ได้
-2. หา root cause
-3. แก้จุดเล็กที่สุดที่ถูกต้อง
-4. เพิ่ม regression check
-5. verify path ที่เสียและ path ปกติ
+1. ถ้ามี Obsidian context manifest (`00-Agent-Context.md` หรือ `.bda/obsidian-context.md`) ให้อ่านก่อนเริ่ม และเตรียม session/evidence note ตาม context; ถ้าไม่มีและงานต้องผูกกับ Obsidian ให้ใช้ `commands/init.md`
+2. reproduce หรืออธิบายเหตุที่ reproduce ไม่ได้
+3. หา root cause
+4. แก้จุดเล็กที่สุดที่ถูกต้อง
+5. เพิ่ม regression check
+6. verify path ที่เสียและ path ปกติ
+7. อัปเดต Obsidian session/evidence note ด้วย root cause, fix, testcase/regression evidence, commands run, และข้อจำกัด ถ้ามี context
 
-Output ที่ต้องส่ง: root cause, fix, regression evidence
+Output ที่ต้องส่ง: root cause, fix, regression evidence, และ Obsidian note ที่อัปเดตถ้ามี context
 
 Output ที่ต้องส่งต้องมีหัวข้อ: BDA Standard files used, Pipeline trace, Commands run, Verification / Evidence, Limitations / Risks / Next steps
 ```
 
 ## Checklist
+- [ ] อ่าน Obsidian context manifest ถ้ามี หรือระบุว่าไม่มี context
 - [ ] reproduce หรืออธิบายเหตุที่ reproduce ไม่ได้
 - [ ] หา root cause
 - [ ] แก้จุดเล็กที่สุดที่ถูกต้อง
 - [ ] เพิ่ม regression check
 - [ ] verify path ที่เสียและ path ปกติ
+- [ ] อัปเดต session/evidence note หรือระบุเหตุผลที่ไม่ได้อัปเดต
 
 ## Required report sections
 

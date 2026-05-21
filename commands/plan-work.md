@@ -9,20 +9,23 @@
 ทำงาน: Plan Work
 Context: <วาง task/ไฟล์/ลิงก์/ข้อจำกัด>
 โปรดทำตามขั้นตอนนี้:
-1. เลือกขนาดงาน small/medium/large
-2. แบ่งขั้นตอนที่ verify ได้
-3. ระบุไฟล์หลักและ command ตรวจ
-4. ลดงานที่ไม่จำเป็น
+1. ถ้ามี Obsidian context manifest (`00-Agent-Context.md` หรือ `.bda/obsidian-context.md`) ให้อ่านก่อนวางแผน; ถ้าไม่มีและงานต้องผูกกับ Obsidian ให้เสนอใช้ `commands/init.md`
+2. เลือกขนาดงาน small/medium/large
+3. แบ่งขั้นตอนที่ verify ได้
+4. ระบุไฟล์หลัก, command ตรวจ, และ Obsidian work/evidence note ที่จะอัปเดตเมื่อเกี่ยวข้อง
+5. ลดงานที่ไม่จำเป็น
 
-Output ที่ต้องส่ง: แผน 3-7 bullet พร้อม verification
+Output ที่ต้องส่ง: แผน 3-7 bullet พร้อม verification และ Obsidian update target ถ้ามี context
 
 Output ที่ต้องส่งต้องมีหัวข้อ: BDA Standard files used, Pipeline trace, Commands run, Verification / Evidence, Limitations / Risks / Next steps
 ```
 
 ## Checklist
+- [ ] อ่าน Obsidian context manifest ถ้ามี หรือระบุว่าไม่มี context
 - [ ] เลือกขนาดงาน small/medium/large
 - [ ] แบ่งขั้นตอนที่ verify ได้
 - [ ] ระบุไฟล์หลักและ command ตรวจ
+- [ ] ระบุ session/evidence note ที่จะอัปเดตถ้าใช้ Obsidian
 - [ ] ลดงานที่ไม่จำเป็น
 
 ## Required report sections

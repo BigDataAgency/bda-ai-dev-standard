@@ -9,22 +9,26 @@
 ทำงาน: Update Obsidian
 Context: <วาง task/ไฟล์/ลิงก์/ข้อจำกัด>
 โปรดทำตามขั้นตอนนี้:
-1. ยืนยัน vault/path ก่อน
+1. ยืนยัน vault/path ก่อน และอ่าน Obsidian context manifest (`00-Agent-Context.md` หรือ `.bda/obsidian-context.md`) ถ้ามี; ถ้าไม่มีให้ใช้ `commands/init.md` เพื่อสร้าง context ก่อนอัปเดตแบบต่อเนื่อง
 2. ห้ามแตะ shared repo โดยไม่ได้รับอนุญาต
 3. รักษา link/tag/frontmatter
 4. ไม่สร้าง duplicate note
-5. สรุปไฟล์ที่อัปเดต
+5. อัปเดต session/evidence/index notes ที่เกี่ยวข้องกับงานล่าสุด
+6. เก็บ testcase/evidence ที่ตรวจจริงไว้ใน path ตาม manifest; ถ้าไม่มีหลักฐานให้ใช้ `pending evidence` ไม่สร้างหลักฐานปลอม
+7. สรุปไฟล์ที่อัปเดต
 
-Output ที่ต้องส่ง: Obsidian update summary
+Output ที่ต้องส่ง: Obsidian update summary พร้อม session/evidence notes
 
 Output ที่ต้องส่งต้องมีหัวข้อ: BDA Standard files used, Pipeline trace, Commands run, Verification / Evidence, Limitations / Risks / Next steps
 ```
 
 ## Checklist
+- [ ] อ่าน Obsidian context manifest ถ้ามี หรือระบุว่าไม่มี context
 - [ ] ยืนยัน vault/path ก่อน
 - [ ] ห้ามแตะ shared repo โดยไม่ได้รับอนุญาต
 - [ ] รักษา link/tag/frontmatter
 - [ ] ไม่สร้าง duplicate note
+- [ ] อัปเดต session/evidence/index notes ที่เกี่ยวข้อง
 - [ ] สรุปไฟล์ที่อัปเดต
 
 ## Required report sections

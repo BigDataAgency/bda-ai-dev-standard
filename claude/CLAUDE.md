@@ -12,7 +12,7 @@
 
 1. Copy ไฟล์นี้ไปเป็น `CLAUDE.md` ที่ root ของ target repo
 2. Copy `claude/commands/*.md` ไปไว้ที่ `.claude/commands/` ของ target repo
-3. เปิด Claude Code แบบ interactive ใน target repo แล้วใช้ slash commands ได้ เช่น `/fix-bug`, `/review-change`, `/build-feature`, `/write-document`, `/verify-work`, `/standard-feedback`, `/daily-log`, `/weekly-focus`, `/test-report`
+3. เปิด Claude Code แบบ interactive ใน target repo แล้วใช้ slash commands ได้ เช่น `/init`, `/fix-bug`, `/review-change`, `/build-feature`, `/write-document`, `/verify-work`, `/standard-feedback`, `/daily-log`, `/weekly-focus`, `/test-report`
 
 หมายเหตุ: slash commands ใช้กับ interactive Claude Code เท่านั้น; ใน print mode (`claude -p`) ให้ reference path ของ command หรือ paste เนื้อหา command แทน เพราะ `/command` จะไม่ทำงานแบบ interactive
 
@@ -25,6 +25,12 @@
 - `/test-report` → `commands/test-report.md` → internal `commands/test-scenario-report.md`
 
 หมายเหตุ: slash commands ใช้กับ Claude Code interactive เท่านั้น; Gemini/Claude coworker ใช้ prompt commands และ Codex ใช้ agent instruction.
+
+## Obsidian init context
+
+ใช้ `/init` หรือ `commands/init.md` เมื่อ project ต้องให้ Claude รู้จักโครงสร้าง Obsidian ก่อนทำงาน. Init ต้องสร้าง/อัปเดต `00-Agent-Context.md` ตาม `templates/obsidian-context.md` และ session/evidence notes ตาม `templates/obsidian-work-note.md`.
+
+หลังมี context แล้ว `/plan-work`, `/fix-bug`, `/build-feature`, `/write-document`, `/test-report`, และ `/update-obsidian` ต้องอ่าน manifest ก่อนทำงาน และอัปเดต session/evidence note เป็น default โดยไม่สร้างหลักฐานปลอม.
 
 ## Test Scenario Report สำหรับ QA/product evidence
 

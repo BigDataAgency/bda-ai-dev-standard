@@ -9,23 +9,27 @@
 ทำงาน: Write Document
 Context: <วาง task/ไฟล์/ลิงก์/ข้อจำกัด>
 โปรดทำตามขั้นตอนนี้:
-1. กำหนด audience
-2. เลือกโครงสร้าง
-3. เขียนให้ทำตามได้จริง
-4. ใส่ตัวอย่าง
-5. ตรวจความถูกต้องและลิงก์
+1. ถ้ามี Obsidian context manifest (`00-Agent-Context.md` หรือ `.bda/obsidian-context.md`) ให้อ่านก่อนเลือกที่เก็บเอกสาร; ถ้าไม่มีและงานต้องผูกกับ Obsidian ให้ใช้ `commands/init.md`
+2. กำหนด audience
+3. เลือกโครงสร้างและ target note/folder โดยรักษา naming, link, tag, frontmatter เดิม
+4. เขียนให้ทำตามได้จริง
+5. ใส่ตัวอย่าง
+6. ตรวจความถูกต้องและลิงก์
+7. อัปเดต index/session note ถ้าเอกสารอยู่ใน Obsidian context
 
-Output ที่ต้องส่ง: เอกสารพร้อมใช้งาน
+Output ที่ต้องส่ง: เอกสารพร้อมใช้งาน พร้อม path/link และ Obsidian update summary ถ้ามี context
 
 Output ที่ต้องส่งต้องมีหัวข้อ: BDA Standard files used, Pipeline trace, Commands run, Verification / Evidence, Limitations / Risks / Next steps
 ```
 
 ## Checklist
+- [ ] อ่าน Obsidian context manifest ถ้ามี หรือระบุว่าไม่มี context
 - [ ] กำหนด audience
 - [ ] เลือกโครงสร้าง
 - [ ] เขียนให้ทำตามได้จริง
 - [ ] ใส่ตัวอย่าง
 - [ ] ตรวจความถูกต้องและลิงก์
+- [ ] อัปเดต index/session note ถ้าใช้ Obsidian
 
 ## Required report sections
 
