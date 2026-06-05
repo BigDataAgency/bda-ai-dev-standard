@@ -33,6 +33,15 @@
 
 หมายเหตุ: slash commands ใช้กับ Claude Code interactive เท่านั้น; Gemini/Claude coworker ใช้ prompt commands และ Codex ใช้ agent instruction.
 
+## Slash command UX
+
+ใช้ slash command ชุดเดิมเป็น default เช่น `/fix-bug`, `/build-feature`, `/review-change`, `/plan-work`, `/test-report`, และ `/standard-feedback`. เมื่อมาตรฐานเพิ่ม discipline ให้เพิ่มใน workflow ภายใน command ไม่ใช่เปลี่ยนชื่อ command หรือบังคับขั้นตอนยาวเกินงาน.
+
+- งานเล็ก: ถาม/รายงานเฉพาะ success criteria, minimum correct change, verification, risk
+- งานกลาง/ใหญ่: เพิ่มแผน phase, rollout, และ evidence mapping ตามความเสี่ยง
+- ถาม clarification เฉพาะเมื่อ ambiguity กระทบ scope, data safety, security, หรือ correctness
+- ถ้าไม่กระทบ ให้ระบุ assumption แล้วทำต่อแบบเล็กที่สุด
+
 ## Obsidian init context
 
 ใช้ `/init` หรือ `commands/init.md` เมื่อ project ต้องให้ Claude รู้จักโครงสร้าง Obsidian ก่อนทำงาน. Init ต้องสร้าง/อัปเดต `00-Agent-Context.md` ตาม `templates/obsidian-context.md` และ session/evidence notes ตาม `templates/obsidian-work-note.md`.

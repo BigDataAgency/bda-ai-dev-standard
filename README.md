@@ -1,6 +1,6 @@
 # BDA AI Dev Standard
 
-Version: `0.8.0`
+Version: `0.8.1`
 License: MIT
 
 มาตรฐานกลางสำหรับการทำงานร่วมกับ AI ในงานพัฒนา ซ่อมบั๊ก ตรวจโค้ด เขียนเอกสาร งาน Obsidian งาน Performance และงานติดตามทีมของ BDA
@@ -11,7 +11,7 @@ License: MIT
 
 BDA AI Dev Standard ใช้ Semantic Versioning: `MAJOR.MINOR.PATCH`
 
-- Current version: `0.8.0`
+- Current version: `0.8.1`
 - ดูประวัติการเปลี่ยนแปลงที่ `CHANGELOG.md`
 - เลข version หลักอยู่ใน `VERSION`
 - ทุก update สำคัญต้องเปลี่ยน version ใน repo นี้ก่อน rollout
@@ -77,6 +77,18 @@ Adapter usage:
 - Gemini: use prompt commands in `gemini/prompts/`; Gemini does not use Claude Code slash commands.
 - Claude coworker: use prompt commands in `claude-coworker/prompts/`; these are paste/reference prompts, not Claude Code slash commands.
 - Codex: use `codex/AGENTS.md` as agent instruction and reference the command files by path.
+
+### Command UX and workflow discipline
+
+ผู้ใช้ยังใช้ command/slash command ชุดเดิมได้ เช่น `/fix-bug`, `/build-feature`, `/review-change`, `/plan-work`, `/test-report`, และ `/standard-feedback`. การปรับปรุงมาตรฐานควรอยู่ที่ workflow ภายใน ไม่ใช่เปลี่ยนชื่อ command หรือเพิ่มภาระให้ผู้ใช้โดยไม่จำเป็น.
+
+หลักการ rollout:
+
+- Keep command names stable: เปลี่ยนชื่อ command เฉพาะเมื่อเป็น breaking release และมี migration note
+- Lightweight by default: งานเล็กให้ถาม/รายงานเฉพาะ success criteria, minimum correct change, verification, และ risk ที่จำเป็น
+- Ask only when it matters: ถาม clarification เฉพาะ ambiguity ที่กระทบ scope, data safety, security, หรือ correctness; ถ้าไม่กระทบให้ระบุ assumption แล้วทำต่อแบบเล็กที่สุด
+- Evidence over ceremony: เพิ่มหลักฐานจริงและ evidence mapping แทนการเพิ่มเอกสารยาว ๆ
+- Same command, better internals: command เดิมต้องนำผู้ใช้ผ่าน success criteria, pattern check, minimal implementation, verification mapping, และ handoff ที่ตรวจกลับได้
 
 ## Obsidian init context workflow
 

@@ -8,6 +8,15 @@ This project uses Semantic Versioning: `MAJOR.MINOR.PATCH`.
 - MINOR: new commands, workflows, templates, adapters, or substantial behavior improvements
 - PATCH: clarifications, typo fixes, safer wording, and non-breaking documentation updates
 
+## [0.8.1] - 2026-06-05
+
+### Changed
+
+- Clarified that supported slash command names remain stable while workflow internals add proportional discipline checks.
+- Added guidance for asking clarification only when ambiguity affects scope, data safety, security, or correctness.
+- Reinforced coding discipline for lightweight tasks: compact success criteria, minimum correct change, and verification maps to success criteria instead of heavy reports.
+- Updated current version metadata to `0.8.1`.
+
 ## [0.8.0] - 2026-05-24
 
 ### Changed

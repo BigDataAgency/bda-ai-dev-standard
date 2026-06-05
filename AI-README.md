@@ -41,6 +41,15 @@
 
 Adapter notes: Claude Code ใช้ slash commands เฉพาะ interactive mode; Gemini/Claude coworker ใช้ prompt commands; Codex ใช้ agent instruction ใน `codex/AGENTS.md`.
 
+## Command UX and workflow discipline
+
+- ใช้ command/slash command ชื่อเดิมต่อไป; ห้ามเปลี่ยนชื่อ command เพื่อเพิ่ม discipline ถ้าไม่มี migration plan
+- งานเล็กให้ใช้ flow สั้น: success criteria, minimum correct change, verification, risk
+- งานกลาง/ใหญ่ค่อยเพิ่ม planning, phase, rollout, และ evidence mapping ที่ละเอียดขึ้น
+- ถาม clarification เฉพาะเมื่อ ambiguity กระทบ scope, data safety, security, หรือ correctness
+- ถ้า ambiguity ไม่กระทบ ให้ระบุ assumption แล้วทำต่อแบบเล็กที่สุด
+- เป้าหมายคือ command เดิมแต่ workflow ภายในตรวจกลับได้ขึ้น ไม่ใช่เพิ่มพิธีการ
+
 ## Test scenario report workflow
 
 ใช้เมื่อต้องการทำ test case/scenario, capture screenshot, ตรวจ console/network และสร้าง report สำหรับ QA/product evidence โดยแยกจาก performance evaluation

@@ -20,6 +20,7 @@
 Codex uses this file as agent instruction; it does not use Claude Code slash commands. When asked for commands, reference normal command names:
 
 - `test-report` → `commands/test-report.md` and `commands/test-scenario-report.md`; QA/product evidence only, not individual evaluation.
+- Keep command names stable. Improve the workflow behind existing commands instead of inventing new names unless the user explicitly requests a new command or the standard is being versioned with a migration note.
 
 ## Working rules
 
@@ -30,6 +31,7 @@ Codex uses this file as agent instruction; it does not use Claude Code slash com
 - หลีกเลี่ยง speculative abstraction/config/dependency/feature และ unrelated refactor/format churn
 - ทุก changed line ต้อง trace กลับไปยัง request, bug, success criteria, หรือ verification ได้
 - ถาม clarification เฉพาะ ambiguity ที่กระทบ scope, data safety, security, หรือ correctness
+- สำหรับงานเล็ก ให้ workflow เบา: success criteria, minimum correct change, verification, risk; อย่าเพิ่มรายงานยาวถ้าไม่ช่วยตรวจงาน
 - งาน bug fix ต้อง reproduce หรืออธิบายให้ชัดว่าทำไม reproduce ไม่ได้, หา root cause, แก้แบบ minimal, และทำ regression check
 - รัน verification ที่เกี่ยวข้องก่อนสรุป และ map ผลตรวจกลับไปยัง success criteria
 - ห้าม claim ว่ารัน test หรือใช้งานได้ ถ้าไม่ได้รัน/ตรวจจริง
