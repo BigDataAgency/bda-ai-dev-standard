@@ -77,12 +77,19 @@ Feedback นี้ไม่ใช่ performance review, score, KPI, daily perfo
 - ใช้ `bda start`, `bda event`, และ `bda stop` จาก `scripts/bda.mjs` เป็น default; ใช้ `scripts/bda-work-event.mjs` สำหรับ one-off event
 - คุยทั่วไป ทดลองถามครั้งแรก หรือ setup tool ยังไม่ต้องบังคับ metadata
 - ถ้าผู้ใช้พิมพ์ `bda start` ให้ถามกลับ/เติม draft metadata ให้ตรวจ ได้แก่ `project`, `task_summary`, `command`, `work_type`, `employee_code`, `employee_group`, `ai_provider`, `ai_model`, และ `used_bda_gateway`
+- สำหรับ Hermes/local model ให้ใช้ metadata confirmation แบบสั้นเท่านั้น; อย่า paste standard ยาวหรือ JSON ก้อนใหญ่ถ้าไม่จำเป็น
 - ถ้าผู้ใช้พิมพ์ `bda help` ให้แสดง command catalog แบบสั้นจาก `docs/bda-session-cli.md`
 - ระหว่าง session ให้รับรูปแบบ `bda-dev-debug: <prompt>`, `bda-nondev-explore: <prompt>`, หรือ `bda-pm-status: <prompt>` แล้วส่ง event ของ command นั้น
-- ถ้าผู้ใช้พิมพ์ `bda stop` ให้สรุป outcome/status/blocker/next step และส่ง stop event
+- ถ้าผู้ใช้พิมพ์ `bda stop` ให้สรุป outcome/status/blocker/next step และส่ง stop event โดยต้องใช้ session_id/project/task เดิมจาก active `bda start`; ห้ามเดา session ใหม่
 - ถ้าเป็นงาน dev/nondev/PM lead เช่น `/fix-bug`, `/review-change`, `/write-document`, `/test-report`, `/pm-log`, `/pm-status`, `/pm-risk` ต้องมี metadata: `employee_code`, `employee_group`, `command`, `task_summary`, `work_type`, `project`, `tool`, `ai_model`, `status`, และผลลัพธ์งาน
 - ห้าม hardcode production endpoint, API key, employee key, หรือ private IP ใน public repo; ให้ตั้งผ่าน env/config หรือ private rollout package เท่านั้น
 - ถ้าส่ง endpoint ไม่ได้ ให้บันทึก local fallback/outbox และแจ้งใน handoff ว่า event ยังไม่ได้ sync
+
+## Model/context/vision routing
+
+- Local/Qwen coding model: ใช้กับ text/code แบบ targeted เท่านั้น อ่านเฉพาะไฟล์/ช่วงที่เกี่ยวข้อง
+- Context ใกล้เต็ม: สรุปสิ่งที่รู้ 5-8 bullet แล้วเปิด session ใหม่หรือ route ไป model context ใหญ่
+- งานภาพ/screenshot/จุดที่วง/doc image: ให้ใช้ Gemini/NotebookLM/vision model อ่านภาพก่อน แล้วเอาสรุปกลับมาทำงานต่อใน Hermes; ห้ามฝืนเดาภาพด้วย text-only/local coder
 
 ## Output บังคับ
 

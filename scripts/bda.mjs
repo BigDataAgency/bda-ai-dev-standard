@@ -6,7 +6,7 @@ import path from "node:path";
 import readline from "node:readline/promises";
 
 const DEFAULT_URL = "https://example.com/bda/work-events";
-const SESSION_VERSION = "bda-session/0.10.0";
+const SESSION_VERSION = "bda-session/0.10.1";
 
 const COMMANDS = [
   ["bda-dev-debug", "debug", "แก้บั๊ก / ไล่ error / หาสาเหตุ"],
@@ -318,7 +318,7 @@ async function event(config, args) {
   }
   await askMissing(args, [["task", "Task summary for this event"]]);
   const now = new Date().toISOString();
-  const payload = baseEvent(config, { ...args, status: args.status || "done" }, session);
+  const payload = baseEvent(config, { ...args, session_id: session.session_id, status: args.status || "done" }, session);
   const missing = missingFields(payload);
   if (missing.length) {
     console.error(JSON.stringify({ ok: false, missing }, null, 2));
@@ -342,6 +342,10 @@ async function stop(config, args) {
   await askMissing(args, [["outcome", "Outcome / result summary"]]);
   const payload = baseEvent(config, {
     ...args,
+    project: session.project,
+    command: "bda stop",
+    session_id: session.session_id,
+    work_type: session.work_type,
     status: args.status || "done",
     duration_ms: args.duration_ms || durationMs,
     task: args.task || session.task_summary,

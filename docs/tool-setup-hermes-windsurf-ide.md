@@ -130,6 +130,14 @@ BDA_META: {"project":"Project Name","tool":"hermes-desktop-agent","task_summary"
 
 For casual chat or first-time setup tests, metadata is optional.
 
+### Hermes model choice
+
+- Fast/local chat: use for short questions, summaries, and setup checks.
+- Qwen3 Coder/local coder: use for targeted text/code work only. Keep prompts small and specify the file/function/error slice.
+- Larger-context/paid model: use when the task involves long history, many files, large logs, or repeated context-limit errors.
+- Vision/image work: use Gemini, NotebookLM, or a vision-capable model to read screenshots/circled UI/document images first, then paste the extracted facts back into Hermes.
+- If a session hits context limit, summarize the current state in 5-8 bullets and start a new session or switch to a larger-context model.
+
 ## Windsurf
 
 Windsurf setup depends on the installed version and organization policy.

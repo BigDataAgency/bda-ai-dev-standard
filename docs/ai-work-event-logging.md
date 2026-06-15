@@ -101,6 +101,19 @@ bda stop --status done --outcome "what changed" --next-step "what happens next"
 
 When used inside AI chat, `bda start` means the AI should draft metadata and ask for confirmation before starting the real task. This replaces a popup UI and keeps the flow usable in Hermes, Claude, Codex, Windsurf, Cursor, Gemini, and other chat tools.
 
+Use the compact confirmation format for Hermes/local models:
+
+```text
+Project:
+Task:
+Command:
+Work type:
+Employee:
+Model:
+
+ถ้าถูกต้องตอบ "เริ่ม"; ถ้าผิดแก้เฉพาะ field นั้น
+```
+
 During an active session, staff can write commands as:
 
 ```text
@@ -110,6 +123,20 @@ bda-pm-status: summarize project status for lead
 ```
 
 The AI or local helper must turn each useful command into a work event. If the staff member uses a non-BDA AI provider, `used_bda_gateway=false` is valid, but the event should still be sent through the BDA work-event endpoint or queued locally.
+
+Stop behavior:
+
+- `bda stop` closes the active session created by `bda start`.
+- Keep the same `session_id`, employee, project, task, provider, and model unless the staff explicitly corrects a wrong field.
+- Stop may add final `status`, `outcome`, `blocker`, `next_step`, and `duration_ms`.
+- If the AI cannot identify the active session, ask for confirmation instead of sending a new mismatched stop event.
+
+Context and model routing:
+
+- Local Qwen3 Coder style models are for text/code and should receive small, targeted context.
+- For long code tasks, split work into smaller steps or use a larger-context model.
+- For screenshot/vision/doc-image tasks, first use Gemini, NotebookLM, or a vision-capable model to extract the visual facts; then continue in Hermes using the extracted summary.
+- If context limit appears, stop adding content, summarize what is known, and continue in a new session or larger-context model.
 
 ## Tool Support
 

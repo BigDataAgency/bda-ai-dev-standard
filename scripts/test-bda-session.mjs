@@ -49,6 +49,7 @@ assert.equal(startJson.ok, true);
 assert.equal(startJson.session.employee_code, "BDA999");
 assert.equal(startJson.session.command, "bda-dev-debug");
 assert.equal(startJson.send_result.dry_run, true);
+const activeSessionId = startJson.session.session_id;
 
 const current = run(["current"]);
 assert.equal(JSON.parse(current.stdout).active, true);
@@ -60,7 +61,9 @@ const event = run([
   "--status", "done",
   "--dry-run",
 ]);
-assert.equal(JSON.parse(event.stdout).event.command, "bda-dev-review");
+const eventJson = JSON.parse(event.stdout);
+assert.equal(eventJson.event.command, "bda-dev-review");
+assert.equal(eventJson.event.session_id, activeSessionId);
 
 const stop = run([
   "stop",
@@ -72,6 +75,8 @@ const stop = run([
 const stopJson = JSON.parse(stop.stdout);
 assert.equal(stopJson.ok, true);
 assert.equal(stopJson.event.status, "done");
+assert.equal(stopJson.event.command, "bda stop");
+assert.equal(stopJson.event.session_id, activeSessionId);
 assert.equal(fs.existsSync(path.join(work, ".bda-skills", "current-session.json")), false);
 assert.equal(fs.existsSync(stopJson.archived_session), true);
 

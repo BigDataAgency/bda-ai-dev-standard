@@ -50,6 +50,8 @@ Stop the session:
 bda stop --status done --outcome "login validation fixed" --next-step "deploy staging"
 ```
 
+`bda stop` must close the current active session. Do not create a new `session_id` at stop time. The project/task/session identity comes from the previous `bda start`; only the final status, outcome, blocker, and next step should change.
+
 Show help and command catalog:
 
 ```bash
@@ -84,6 +86,19 @@ used_bda_gateway: true/false
 
 If the AI can infer a field safely from the user request or project context, fill it in and ask for confirmation. If a field affects reporting quality and cannot be inferred, ask only for that field.
 
+For local/Hermes models with small context windows, use the shortest possible metadata confirmation. Do not paste the full standard. A good short version is:
+
+```text
+Project:
+Task:
+Command:
+Work type:
+Employee:
+Model:
+
+ถ้าถูกต้องตอบ "เริ่ม"; ถ้าผิดแก้เฉพาะ field นั้น
+```
+
 ## Command Syntax in Chat
 
 Use a command prefix followed by the staff prompt:
@@ -95,6 +110,27 @@ bda-pm-status: สรุปสถานะ project สำหรับ lead
 ```
 
 During an active `bda start` session, each command should produce or trigger a `bda event` with command, task summary, status, outcome, blocker/next step when relevant, and token/duration values when available.
+
+When the staff member types `bda stop`, the AI must summarize the current session and close that same session:
+
+```text
+Status: done/blocked/failed
+Outcome:
+Blocker:
+Next step:
+```
+
+The AI must not invent a new project, task, employee, or session id during stop. If it is unsure which session is active, ask the staff member to confirm instead of sending a mismatched stop event.
+
+## Context and Vision Limits
+
+Local coding models can hit context limits quickly. Use these rules:
+
+- Do not paste long standards, large files, build logs, or full repo trees into local models.
+- Ask the model to read or discuss only the file/function/error slice needed for the current step.
+- If context is near full, summarize the session in 5-8 bullets and start a new session or switch to a larger-context model.
+- For screenshots, circled UI points, or image documents, use Gemini/NotebookLM/a vision model to extract the visual facts first, then continue the work in Hermes with that summary.
+- Qwen3 Coder Local is primarily for text/code. Do not force it to guess visual details.
 
 ## Command Catalog
 

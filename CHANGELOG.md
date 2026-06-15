@@ -8,6 +8,21 @@ This project uses Semantic Versioning: `MAJOR.MINOR.PATCH`.
 - MINOR: new commands, workflows, templates, adapters, or substantial behavior improvements
 - PATCH: clarifications, typo fixes, safer wording, and non-breaking documentation updates
 
+## [0.10.1] - 2026-06-15
+
+### Changed
+
+- Added a compact local/Hermes prompt path so Qwen/local models do not receive the full standard and hit context limits during `bda start`.
+- Clarified context routing: split long work, avoid large pasted files/logs, and move long coding tasks to larger-context models.
+- Clarified vision routing: use Gemini, NotebookLM, or a vision-capable model to extract screenshot/image facts before continuing in Hermes/Qwen.
+- Updated AI/Codex/Claude guidance so `bda stop` must close the existing active session instead of drafting new metadata.
+- Updated version metadata to `0.10.1`.
+
+### Fixed
+
+- `scripts/bda.mjs` now keeps `bda event` and `bda stop` on the active session id, and `bda stop` sends a clear `command="bda stop"` close event.
+- Added smoke assertions that events and stop events preserve the started session id.
+
 ## [0.10.0] - 2026-06-14
 
 ### Added
