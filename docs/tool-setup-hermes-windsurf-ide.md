@@ -137,6 +137,7 @@ For casual chat or first-time setup tests, metadata is optional.
 - Larger-context/paid model: use when the task involves long history, many files, large logs, or repeated context-limit errors.
 - Vision/image work: use Gemini, NotebookLM, or a vision-capable model to read screenshots/circled UI/document images first, then paste the extracted facts back into Hermes.
 - If a session hits context limit, summarize the current state in 5-8 bullets and start a new session or switch to a larger-context model.
+- BDA Gateway local capacity is managed centrally. When BDA adds or removes A40/GX10 worker nodes, staff do not need to reinstall Hermes, change API keys, or rename models; keep using the same Base URL and model names.
 
 ## Windsurf
 

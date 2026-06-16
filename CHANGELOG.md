@@ -8,6 +8,14 @@ This project uses Semantic Versioning: `MAJOR.MINOR.PATCH`.
 - MINOR: new commands, workflows, templates, adapters, or substantial behavior improvements
 - PATCH: clarifications, typo fixes, safer wording, and non-breaking documentation updates
 
+## [0.10.2] - 2026-06-16
+
+### Changed
+
+- Clarified that BDA Gateway capacity changes such as adding a second A40 node are handled centrally by the gateway; staff keep the same key, Base URL, and model names.
+- Added Hermes/IDE guidance that `Free Fast Local`, `Auto Default Local`, and `Qwen3 Coder` can be load-balanced behind the gateway without employee reinstall.
+- Updated version metadata to `0.10.2`.
+
 ## [0.10.1] - 2026-06-15
 
 ### Changed

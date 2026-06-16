@@ -6,7 +6,7 @@ import path from "node:path";
 import readline from "node:readline/promises";
 
 const DEFAULT_URL = "https://example.com/bda/work-events";
-const SESSION_VERSION = "bda-session/0.10.1";
+const SESSION_VERSION = "bda-session/0.10.2";
 
 const COMMANDS = [
   ["bda-dev-debug", "debug", "แก้บั๊ก / ไล่ error / หาสาเหตุ"],

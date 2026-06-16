@@ -59,6 +59,7 @@
 
 - งานคุยสั้นหรือสรุปทั่วไป: ใช้ fast/local ได้
 - งาน code เบา-กลาง: ใช้ Qwen3 Coder Local ได้ แต่ต้องอ่านเฉพาะไฟล์/ช่วงที่เกี่ยวข้อง
+- ความจุ Local A40/GX10 หลัง BDA Gateway เป็นเรื่องที่ระบบจัดการเอง ถ้าเพิ่ม worker node พนักงานไม่ต้องเปลี่ยน key, Base URL, หรือชื่อ model
 - งาน code ใหญ่, หลายไฟล์, history ยาว, หรือ context ใกล้เต็ม: แตกเป็น session ย่อย หรือใช้ model context ใหญ่กว่า
 - งานภาพ, screenshot, จุดที่วงบน UI, doc image: ใช้ Gemini/NotebookLM/vision model อ่านภาพก่อน แล้วนำผลสรุปกลับมาคุยต่อใน Hermes; อย่าฝืนให้ Qwen3 Coder Local เดาภาพ
 - ถ้าเจอ context limit: หยุดเติม context, สรุปสิ่งที่รู้ 5-8 bullet, เปิด session ใหม่หรือเปลี่ยน model
