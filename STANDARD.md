@@ -37,7 +37,18 @@
 - `Pipeline trace` ต้องตามรอย Understand → Plan → Execute → Verify → Handoff และบอก command/workflow ที่ใช้ในแต่ละช่วง
 - `Commands run` ต้องเป็นคำสั่งหรือ tool ที่รันจริงพร้อมผลสรุป ถ้าไม่ได้รันต้องเขียนว่าไม่ได้รันและเหตุผล
 
-## 6. Standard Feedback Loop
+## 6. Gateway-First Usage
+- สำหรับ mapped BDA work แบบ non-trivial ให้ใช้ gateway-first-by-default: หลัง `bda start` ต้องพยายามมี Gateway checkpoint อย่างน้อย 1 ครั้งก่อนปิด session เว้นแต่มีเหตุผล skip/fail ที่ชัดเจน
+- สถานะ Gateway ต่อ session ต้องเป็น `gateway_used`, `gateway_deferred`, `gateway_skipped`, หรือ `gateway_failed`
+- ใช้ Gateway เมื่อเป็น bounded subtask ที่ควรมี usage ใน audit trail หรือช่วยลดความเสี่ยงจริง เช่น requirement/risk/test-plan/evidence/PM wording/release/deploy/security/auth/schema review
+- ใช้ `gateway_deferred` เมื่อ Codex/AI หลักต้องเก็บ deterministic repo/tool evidence ก่อน แต่ยังต้องวาง checkpoint ก่อน closeout
+- ห้ามยิง Gateway เปล่าเพื่อสร้าง usage; ต้องมี model call จริง สำเร็จ และนำผลมาใช้ก่อน log `used_bda_gateway=true`
+- Codex/Claude/Gemini/AI อื่นที่ไม่ได้ route ผ่าน Gateway ต้องใช้ metadata จริงของ runtime นั้น และ keep `used_bda_gateway=false`
+- ถ้า skip หรือ fail ให้บอกเหตุผลใน outcome/blocker/final summary แทนการปลอมว่าใช้ Gateway
+- Gateway target ranges เป็น guidance ไม่ใช่ KPI แข็ง: 80-100% สำหรับ PM/reporting และ delivery evidence, 70-100% สำหรับ security/auth/schema/CI/CD/high-risk, 50-80% สำหรับ ambiguous multi-module, 30-60% สำหรับ bug/feature ปกติ, 0-20% สำหรับ deterministic checks, และ 0% สำหรับ casual/setup/secrets-sensitive/Codex-only
+- Direct BDA Gateway API ใช้ตรวจ model availability ได้เมื่อ Hermes oneshot มีข้อจำกัด เช่น `bda/qwen3.7-max-paid-cloud` อยู่บน Gateway แต่ Hermes oneshot ไม่คืน final response
+
+## 7. Standard Feedback Loop
 - ใช้ `FEEDBACK.md`, `commands/standard-feedback.md`, `templates/standard-feedback.md`, และ `workflows/standard-improvement.md` เมื่อต้องการ feedback เพื่อปรับปรุง BDA AI Dev Standard เอง
 - รับ feedback ประเภท bug report, confusion, missing command, feature request, scenario request, adoption friction, AI output issue หรือข้อเสนออื่น ๆ ที่ทำให้ standard ดีขึ้น
 - Feedback loop นี้แยกจาก performance process โดยสิ้นเชิง: ไม่ใช่ score, KPI, daily performance, หรือการประเมินบุคคล

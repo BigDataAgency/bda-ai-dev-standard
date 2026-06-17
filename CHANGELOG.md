@@ -8,6 +8,20 @@ This project uses Semantic Versioning: `MAJOR.MINOR.PATCH`.
 - MINOR: new commands, workflows, templates, adapters, or substantial behavior improvements
 - PATCH: clarifications, typo fixes, safer wording, and non-breaking documentation updates
 
+## [0.10.3] - 2026-06-18
+
+### Changed
+
+- Clarified mapped BDA sessions as gateway-first-by-default: every non-trivial mapped session should attempt at least one useful bounded BDA Gateway checkpoint before closeout unless a concrete skip or failure reason applies.
+- Added `gateway_deferred` alongside used/skipped/failed status language so Codex can gather deterministic repo/tool evidence first while still planning a Gateway checkpoint before closeout.
+- Reinforced truthful runtime metadata: Codex Desktop work remains `codex-desktop-agent` / `openai` / `codex/gpt-5` with `used_bda_gateway=false`, while successful Gateway subtasks are logged as separate BDA Gateway events.
+- Updated Gateway guardrails across AI/Codex/session docs to prevent empty prompts, duplicate artificial calls, or marking Gateway usage when the output was not actually used.
+- Updated current version metadata to `0.10.3`.
+
+### Notes
+
+- Documented that direct BDA Gateway API calls can verify `bda/qwen3.7-max-paid-cloud` availability even when Hermes oneshot does not produce a final response for that model.
+
 ## [0.10.2] - 2026-06-16
 
 ### Changed
