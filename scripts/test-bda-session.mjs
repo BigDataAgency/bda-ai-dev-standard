@@ -54,6 +54,20 @@ const activeSessionId = startJson.session.session_id;
 const current = run(["current"]);
 assert.equal(JSON.parse(current.stdout).active, true);
 
+const duplicateStart = run([
+  "start",
+  "--project", "BDA-InnoHub",
+  "--task", "new task should not overwrite active session",
+  "--command", "bda-dev-debug",
+  "--dry-run",
+], { expectFailure: true });
+const duplicateStartJson = JSON.parse(duplicateStart.stderr);
+assert.equal(duplicateStartJson.ok, false);
+assert.match(duplicateStartJson.error, /Active BDA session already exists/);
+assert.equal(duplicateStartJson.active_session.session_id, activeSessionId);
+const currentAfterDuplicate = run(["current"]);
+assert.equal(JSON.parse(currentAfterDuplicate.stdout).session.session_id, activeSessionId);
+
 const event = run([
   "event",
   "--task", "review login fix",

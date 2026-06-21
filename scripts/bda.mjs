@@ -6,7 +6,7 @@ import path from "node:path";
 import readline from "node:readline/promises";
 
 const DEFAULT_URL = "https://example.com/bda/work-events";
-const SESSION_VERSION = "bda-session/0.10.2";
+const SESSION_VERSION = "bda-session/0.10.3";
 
 const COMMANDS = [
   ["bda-dev-debug", "debug", "แก้บั๊ก / ไล่ error / หาสาเหตุ"],
@@ -260,6 +260,21 @@ function archiveSession(config, session) {
   return filePath;
 }
 
+function archiveSupersededSession(config, session, replacementSessionId) {
+  const dir = path.join(configDir(config), "sessions", "superseded-active");
+  ensureDir(dir);
+  const archivedAt = new Date().toISOString();
+  const filePath = path.join(dir, `${session.session_id || Date.now()}.json`);
+  fs.writeFileSync(filePath, JSON.stringify({
+    ...session,
+    status: session.status || "active",
+    superseded_at: archivedAt,
+    superseded_by_session_id: replacementSessionId,
+    superseded_reason: "bda start --force replaced the local active session file; server-side close still requires bda stop or dashboard manual close.",
+  }, null, 2) + "\n");
+  return filePath;
+}
+
 function printHelp() {
   console.log(`BDA AI Dev CLI
 
@@ -286,6 +301,24 @@ Available commands:`);
 }
 
 async function start(config, args) {
+  const activeSession = readSession(config);
+  const force = boolValue(args.force);
+  if (activeSession.session_id && !force) {
+    console.error(JSON.stringify({
+      ok: false,
+      error: "Active BDA session already exists. Run bda stop before starting a new session.",
+      session_file: sessionPath(config),
+      active_session: {
+        session_id: activeSession.session_id,
+        project: activeSession.project,
+        command: activeSession.command,
+        task_summary: activeSession.task_summary,
+        started_at: activeSession.started_at,
+      },
+      hint: "If the old session was already closed elsewhere, close it from Coverage/admin as manual-dashboard-close, then run bda start --force.",
+    }, null, 2));
+    process.exit(2);
+  }
   await askMissing(args, [
     ["project", "Project"],
     ["task", "Task summary"],
@@ -305,9 +338,13 @@ async function start(config, args) {
     started_at: startedAt,
     events: [{ at: startedAt, status: "started", command: event.command, task_summary: event.task_summary }],
   };
+  let supersededSession;
+  if (activeSession.session_id && force) {
+    supersededSession = archiveSupersededSession(config, activeSession, session.session_id);
+  }
   const filePath = saveSession(config, session);
   const result = await sendEvent(config, { ...event, status: "started" }, args);
-  console.log(JSON.stringify({ ok: true, action: "start", session_file: filePath, session, send_result: result }, null, 2));
+  console.log(JSON.stringify({ ok: true, action: "start", session_file: filePath, superseded_session: supersededSession, session, send_result: result }, null, 2));
 }
 
 async function event(config, args) {

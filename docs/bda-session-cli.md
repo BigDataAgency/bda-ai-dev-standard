@@ -52,6 +52,8 @@ bda stop --status done --outcome "login validation fixed" --next-step "deploy st
 
 `bda stop` must close the current active session. Do not create a new `session_id` at stop time. The project/task/session identity comes from the previous `bda start`; only the final status, outcome, blocker, and next step should change.
 
+The CLI keeps one active local session in `.bda-skills/current-session.json`. A new `bda start` must not overwrite that file while a session is still active; run `bda stop` first. If a stale local session was already closed through the Coverage/admin dashboard, use `bda start --force` only after the dashboard close is tagged as a manual close, because the local CLI can no longer prove the old stop event by itself.
+
 Show help and command catalog:
 
 ```bash
