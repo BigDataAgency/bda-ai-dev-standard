@@ -8,6 +8,13 @@ This project uses Semantic Versioning: `MAJOR.MINOR.PATCH`.
 - MINOR: new commands, workflows, templates, adapters, or substantial behavior improvements
 - PATCH: clarifications, typo fixes, safer wording, and non-breaking documentation updates
 
+## [0.10.13] - 2026-06-22
+
+### Fixed
+
+- Restored paid cloud models in Hermes config while keeping `bda/dev-local` and `bda/nondev-local` as the primary local choices.
+- Kept removed experimental models out of the picker: GPT-OSS and Kimi are still not included.
+
 ## [0.10.12] - 2026-06-22
 
 ### Changed
