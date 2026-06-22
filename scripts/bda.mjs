@@ -680,6 +680,7 @@ async function main() {
   if (subcommand === "help" || subcommand === "--help" || subcommand === "-h") return printHelp();
   if (subcommand === "version" || subcommand === "--version" || subcommand === "-v") return printVersion();
   if (subcommand === "update") return updateStandard(args);
+  if (subcommand === "config-status") return printConfigStatus();
   if (subcommand === "start") return start(config, args);
   if (subcommand === "event") return event(config, args);
   if (subcommand === "stop") return stop(config, args);
