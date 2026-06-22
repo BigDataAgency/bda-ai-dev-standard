@@ -37,13 +37,13 @@ const help = run(["help"]);
 assert.match(help.stdout, /bda start/);
 assert.match(help.stdout, /bda-dev/);
 assert.doesNotMatch(help.stdout, /bda-dev-plan-execute/);
-assert.match(help.stdout, /bda-session\/0\.10\.5/);
+assert.match(help.stdout, /bda-session\/0\.10\.6/);
 assert.match(help.stdout, /bda update/);
 
 const version = run(["version"]);
 const versionJson = JSON.parse(version.stdout);
 assert.equal(versionJson.ok, true);
-assert.equal(versionJson.cli_version, "0.10.5");
+assert.equal(versionJson.cli_version, "0.10.6");
 
 const updateDryRun = run(["update", "--dry-run"]);
 const updateJson = JSON.parse(updateDryRun.stdout);

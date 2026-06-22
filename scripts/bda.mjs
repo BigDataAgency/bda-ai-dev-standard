@@ -7,8 +7,65 @@ import readline from "node:readline/promises";
 import { execFileSync } from "node:child_process";
 
 const DEFAULT_URL = "https://example.com/bda/work-events";
-const SESSION_VERSION = "bda-session/0.10.5";
+const SESSION_VERSION = "bda-session/0.10.6";
 const STANDARD_REPO_URL = "https://github.com/BigDataAgency/bda-ai-dev-standard.git";
+const HERMES_CONFIG_PATHS = Array.from(new Set([
+  path.join(os.homedir(), ".hermes", "config.yaml"),
+  process.env.LOCALAPPDATA ? path.join(process.env.LOCALAPPDATA, "hermes", "config.yaml") : "",
+  process.env.APPDATA ? path.join(process.env.APPDATA, "hermes", "config.yaml") : "",
+].filter(Boolean)));
+const HERMES_CACHE_PATHS = [
+  path.join(os.homedir(), ".hermes", "provider_models_cache.json"),
+  path.join(os.homedir(), ".hermes", "models_dev_cache.json"),
+  path.join(os.homedir(), ".hermes", "cache", "model_catalog.json"),
+  process.env.LOCALAPPDATA ? path.join(process.env.LOCALAPPDATA, "hermes", "provider_models_cache.json") : "",
+  process.env.LOCALAPPDATA ? path.join(process.env.LOCALAPPDATA, "hermes", "models_dev_cache.json") : "",
+  process.env.LOCALAPPDATA ? path.join(process.env.LOCALAPPDATA, "hermes", "cache", "model_catalog.json") : "",
+  process.env.APPDATA ? path.join(process.env.APPDATA, "hermes", "provider_models_cache.json") : "",
+  process.env.APPDATA ? path.join(process.env.APPDATA, "hermes", "models_dev_cache.json") : "",
+  process.env.APPDATA ? path.join(process.env.APPDATA, "hermes", "cache", "model_catalog.json") : "",
+].filter(Boolean);
+
+const BDA_HERMES_CONFIG_BLOCK = `model:
+  provider: bda
+  default: bda/auto-default-local
+  context_length: 65536
+  max_tokens: 8192
+  compression_model: bda/auto-default-local
+  auxiliary_compression_model: bda/auto-default-local
+auxiliary:
+  compression:
+    provider: bda
+    model: bda/auto-default-local
+    context_length: 65536
+providers:
+  bda:
+    name: BDA AI Gateway
+    api: https://ai.bda.co.th/v1
+    key_env: BDA_AI_ROUTER_API_KEY
+    transport: openai_chat
+    default_model: bda/auto-default-local
+    discover_models: false
+    models:
+      bda/auto-default-local:
+        context_length: 65536
+      bda/free-fast-local:
+        context_length: 65536
+      bda/qwen3.6-local:
+        context_length: 65536
+      bda/gpt-oss-20b-local:
+        context_length: 32768
+      bda/deepseek-fast-paid-cloud:
+        context_length: 131072
+      bda/deepseek-paid-cloud:
+        context_length: 131072
+      bda/qwen3.7-plus-paid-cloud:
+        context_length: 1000000
+      bda/qwen3.7-max-paid-cloud:
+        context_length: 1000000
+      bda/glm-5.1-paid-cloud:
+        context_length: 131072
+`;
 
 const COMMANDS = [
   ["bda-dev", "dev", "งาน dev/code/debug/review/test แบบ targeted"],
@@ -350,6 +407,8 @@ function updateStandard(args) {
         ? fs.readFileSync(path.join(standardDir, "VERSION"), "utf8").trim()
         : "unknown");
 
+  const configResult = dryRun ? cleanHermesConfig({ dryRun: true }) : cleanHermesConfig({ dryRun: false });
+
   console.log(JSON.stringify({
     ok: true,
     action: "update",
@@ -358,8 +417,121 @@ function updateStandard(args) {
     before_version: beforeVersion,
     after_version: afterVersion,
     used_git_repo: hasGitRepo,
-    note: "Restart Hermes Desktop after update if it is open. Full Hermes provider/model config rewrite will be handled by a future bda update --config.",
+    hermes_config: configResult,
+    note: "Restart Hermes Desktop after update if it is open. Hermes BDA provider/model config has been cleaned so only the BDA AI Gateway group remains.",
   }, null, 2));
+}
+
+function topLevelKey(line) {
+  const match = line.match(/^([A-Za-z0-9_-]+):(?:\s|$)/);
+  return match ? match[1] : "";
+}
+
+function removeTopLevelBlocks(yamlText, keys) {
+  const lines = yamlText.split(/\r?\n/);
+  const out = [];
+  for (let i = 0; i < lines.length; i += 1) {
+    const key = topLevelKey(lines[i]);
+    if (!key || !keys.has(key)) {
+      out.push(lines[i]);
+      continue;
+    }
+    i += 1;
+    while (i < lines.length && !topLevelKey(lines[i])) {
+      i += 1;
+    }
+    i -= 1;
+  }
+  return out.join("\n");
+}
+
+function removeLegacyAgentCommandCatalog(yamlText) {
+  return yamlText
+    .replace(/You are running with BDA AI Dev Standard v[0-9.]+/g, "You are running with BDA AI Dev Standard v0.10.6")
+    .replace(/During an active session, treat bda-dev-\*, bda-nondev-\*, and bda-pm-\* prefixes as real BDA work commands and send\/prepare bda event\./g,
+      "During an active session, use only the compact BDA commands: bda-dev, bda-nondev, and bda-pm. Send/prepare bda event for meaningful subtasks.")
+    .replace(/Command catalog: bda-dev-debug, bda-dev-review, bda-dev-tdd, bda-dev-plan-discuss, bda-dev-plan-create, bda-dev-plan-execute, bda-dev-plan-review, bda-dev-plan-verify, bda-nondev-explore, bda-nondev-write, bda-pm-log, bda-pm-status, bda-pm-risk, bda-pm-followup, bda-pm-requirement, bda-pm-standup\./g,
+      "Command catalog: bda-dev, bda-nondev, bda-pm.");
+}
+
+function collectBdaModelNames(yamlText) {
+  const names = new Set();
+  const modelPattern = /\bbda\/[A-Za-z0-9._-]+/g;
+  for (const match of yamlText.matchAll(modelPattern)) names.add(match[0]);
+  return [...names].sort();
+}
+
+function normalizeHermesBdaConfig(yamlText) {
+  let next = removeTopLevelBlocks(yamlText, new Set(["model", "auxiliary", "providers", "custom_providers"]));
+  next = removeLegacyAgentCommandCatalog(next);
+  next = next.replace(/^\s+$/gm, "");
+  next = next.replace(/\n{3,}/g, "\n\n").trimStart();
+  const merged = `${BDA_HERMES_CONFIG_BLOCK}${next.trim() ? `\n${next}` : ""}\n`;
+  return merged;
+}
+
+function cleanHermesConfig({ dryRun = false } = {}) {
+  const result = {
+    config_paths: HERMES_CONFIG_PATHS.map((configPath) => ({
+      config_path: configPath,
+      exists: fs.existsSync(configPath),
+      changed: false,
+      backup_path: "",
+      before_models: [],
+      after_models: [],
+    })),
+    changed: false,
+    removed_caches: [],
+  };
+
+  for (const entry of result.config_paths) {
+    if (!entry.exists) continue;
+    const before = fs.readFileSync(entry.config_path, "utf8");
+    const after = normalizeHermesBdaConfig(before);
+    entry.before_models = collectBdaModelNames(before);
+    entry.after_models = collectBdaModelNames(after);
+    entry.changed = before !== after;
+    result.changed = result.changed || entry.changed;
+    if (entry.changed && !dryRun) {
+      const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+Z$/, "Z");
+      entry.backup_path = `${entry.config_path}.bak-${stamp}`;
+      fs.copyFileSync(entry.config_path, entry.backup_path);
+      fs.writeFileSync(entry.config_path, after);
+    }
+  }
+
+  for (const cachePath of HERMES_CACHE_PATHS) {
+    if (!fs.existsSync(cachePath)) continue;
+    result.removed_caches.push(cachePath);
+    if (!dryRun) fs.rmSync(cachePath, { force: true });
+  }
+  return result;
+}
+
+function printConfigStatus() {
+  const result = cleanHermesConfig({ dryRun: true });
+  console.log(JSON.stringify({ ok: true, action: "config-status", hermes_config: result }, null, 2));
+}
+
+/*
+ * Kept intentionally small: Hermes config has historically drifted between
+ * releases, so bda update owns the BDA provider/model block end-to-end.
+ */
+function unusedLegacyModelCleanerForReference(yamlText) {
+  const lines = yamlText.split(/\r?\n/);
+  const out = [];
+  for (let i = 0; i < lines.length; i += 1) {
+    const line = lines[i];
+    const match = line.match(/^(\s{6})(bda\/[^:]+):\s*$/);
+    if (!match || !disabled.has(match[2])) {
+      out.push(line);
+      continue;
+    }
+    i += 1;
+    while (i < lines.length && /^\s{8,}\S/.test(lines[i])) i += 1;
+    i -= 1;
+  }
+  return out.join("\n");
 }
 
 function printHelp() {
