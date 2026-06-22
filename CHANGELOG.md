@@ -8,6 +8,15 @@ This project uses Semantic Versioning: `MAJOR.MINOR.PATCH`.
 - MINOR: new commands, workflows, templates, adapters, or substantial behavior improvements
 - PATCH: clarifications, typo fixes, safer wording, and non-breaking documentation updates
 
+## [0.10.7] - 2026-06-22
+
+### Fixed
+
+- Added `bda config-clean` as an explicit Hermes provider/model cleanup command for incident response.
+- Added macOS/Windows Hermes config/cache path variants so cleanup catches more desktop installs.
+- `bda update` can call the freshly updated CLI to run cleanup after pulling a newer standard release.
+- Documented the fallback flow for Hermes still showing two BDA model groups after update.
+
 ## [0.10.6] - 2026-06-22
 
 ### Fixed

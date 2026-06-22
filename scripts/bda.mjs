@@ -7,23 +7,36 @@ import readline from "node:readline/promises";
 import { execFileSync } from "node:child_process";
 
 const DEFAULT_URL = "https://example.com/bda/work-events";
-const SESSION_VERSION = "bda-session/0.10.6";
+const SESSION_VERSION = "bda-session/0.10.7";
 const STANDARD_REPO_URL = "https://github.com/BigDataAgency/bda-ai-dev-standard.git";
+const MAC_HERMES_APP_SUPPORT = path.join(os.homedir(), "Library", "Application Support", "Hermes");
 const HERMES_CONFIG_PATHS = Array.from(new Set([
   path.join(os.homedir(), ".hermes", "config.yaml"),
+  path.join(MAC_HERMES_APP_SUPPORT, "config.yaml"),
   process.env.LOCALAPPDATA ? path.join(process.env.LOCALAPPDATA, "hermes", "config.yaml") : "",
+  process.env.LOCALAPPDATA ? path.join(process.env.LOCALAPPDATA, "Hermes", "config.yaml") : "",
   process.env.APPDATA ? path.join(process.env.APPDATA, "hermes", "config.yaml") : "",
+  process.env.APPDATA ? path.join(process.env.APPDATA, "Hermes", "config.yaml") : "",
 ].filter(Boolean)));
 const HERMES_CACHE_PATHS = [
   path.join(os.homedir(), ".hermes", "provider_models_cache.json"),
   path.join(os.homedir(), ".hermes", "models_dev_cache.json"),
   path.join(os.homedir(), ".hermes", "cache", "model_catalog.json"),
+  path.join(MAC_HERMES_APP_SUPPORT, "provider_models_cache.json"),
+  path.join(MAC_HERMES_APP_SUPPORT, "models_dev_cache.json"),
+  path.join(MAC_HERMES_APP_SUPPORT, "cache", "model_catalog.json"),
   process.env.LOCALAPPDATA ? path.join(process.env.LOCALAPPDATA, "hermes", "provider_models_cache.json") : "",
   process.env.LOCALAPPDATA ? path.join(process.env.LOCALAPPDATA, "hermes", "models_dev_cache.json") : "",
   process.env.LOCALAPPDATA ? path.join(process.env.LOCALAPPDATA, "hermes", "cache", "model_catalog.json") : "",
+  process.env.LOCALAPPDATA ? path.join(process.env.LOCALAPPDATA, "Hermes", "provider_models_cache.json") : "",
+  process.env.LOCALAPPDATA ? path.join(process.env.LOCALAPPDATA, "Hermes", "models_dev_cache.json") : "",
+  process.env.LOCALAPPDATA ? path.join(process.env.LOCALAPPDATA, "Hermes", "cache", "model_catalog.json") : "",
   process.env.APPDATA ? path.join(process.env.APPDATA, "hermes", "provider_models_cache.json") : "",
   process.env.APPDATA ? path.join(process.env.APPDATA, "hermes", "models_dev_cache.json") : "",
   process.env.APPDATA ? path.join(process.env.APPDATA, "hermes", "cache", "model_catalog.json") : "",
+  process.env.APPDATA ? path.join(process.env.APPDATA, "Hermes", "provider_models_cache.json") : "",
+  process.env.APPDATA ? path.join(process.env.APPDATA, "Hermes", "models_dev_cache.json") : "",
+  process.env.APPDATA ? path.join(process.env.APPDATA, "Hermes", "cache", "model_catalog.json") : "",
 ].filter(Boolean);
 
 const BDA_HERMES_CONFIG_BLOCK = `model:
@@ -407,7 +420,7 @@ function updateStandard(args) {
         ? fs.readFileSync(path.join(standardDir, "VERSION"), "utf8").trim()
         : "unknown");
 
-  const configResult = dryRun ? cleanHermesConfig({ dryRun: true }) : cleanHermesConfig({ dryRun: false });
+  const configResult = dryRun ? cleanHermesConfig({ dryRun: true }) : cleanHermesConfigWithUpdatedScript(standardDir);
 
   console.log(JSON.stringify({
     ok: true,
@@ -420,6 +433,23 @@ function updateStandard(args) {
     hermes_config: configResult,
     note: "Restart Hermes Desktop after update if it is open. Hermes BDA provider/model config has been cleaned so only the BDA AI Gateway group remains.",
   }, null, 2));
+}
+
+function cleanHermesConfigWithUpdatedScript(standardDir) {
+  const updatedScript = path.join(standardDir, "scripts", "bda.mjs");
+  if (fs.existsSync(updatedScript) && path.resolve(updatedScript) !== path.resolve(new URL(import.meta.url).pathname)) {
+    try {
+      const raw = execFileSync(process.execPath, [updatedScript, "config-clean"], {
+        encoding: "utf8",
+        env: { ...process.env, BDA_UPDATE_POST_CLEAN: "1" },
+      });
+      const parsed = JSON.parse(raw);
+      if (parsed && parsed.hermes_config) return parsed.hermes_config;
+    } catch {
+      // Fall back to this process' cleaner below.
+    }
+  }
+  return cleanHermesConfig({ dryRun: false });
 }
 
 function topLevelKey(line) {
@@ -447,7 +477,7 @@ function removeTopLevelBlocks(yamlText, keys) {
 
 function removeLegacyAgentCommandCatalog(yamlText) {
   return yamlText
-    .replace(/You are running with BDA AI Dev Standard v[0-9.]+/g, "You are running with BDA AI Dev Standard v0.10.6")
+    .replace(/You are running with BDA AI Dev Standard v[0-9.]+/g, "You are running with BDA AI Dev Standard v0.10.7")
     .replace(/During an active session, treat bda-dev-\*, bda-nondev-\*, and bda-pm-\* prefixes as real BDA work commands and send\/prepare bda event\./g,
       "During an active session, use only the compact BDA commands: bda-dev, bda-nondev, and bda-pm. Send/prepare bda event for meaningful subtasks.")
     .replace(/Command catalog: bda-dev-debug, bda-dev-review, bda-dev-tdd, bda-dev-plan-discuss, bda-dev-plan-create, bda-dev-plan-execute, bda-dev-plan-review, bda-dev-plan-verify, bda-nondev-explore, bda-nondev-write, bda-pm-log, bda-pm-status, bda-pm-risk, bda-pm-followup, bda-pm-requirement, bda-pm-standup\./g,
@@ -513,6 +543,16 @@ function printConfigStatus() {
   console.log(JSON.stringify({ ok: true, action: "config-status", hermes_config: result }, null, 2));
 }
 
+function printConfigClean() {
+  const result = cleanHermesConfig({ dryRun: false });
+  console.log(JSON.stringify({
+    ok: true,
+    action: "config-clean",
+    hermes_config: result,
+    note: "Restart Hermes Desktop after cleaning config/cache.",
+  }, null, 2));
+}
+
 /*
  * Kept intentionally small: Hermes config has historically drifted between
  * releases, so bda update owns the BDA provider/model block end-to-end.
@@ -542,6 +582,8 @@ Flow:
   bda help    ดู command ที่ใช้ได้
   bda version แสดง version ของ CLI/session format
   bda update  อัปเดต BDA AI Dev Standard โดยไม่ต้องแจก zip ใหม่
+  bda config-status  ตรวจ Hermes provider/model config ที่ bda update จะ rewrite
+  bda config-clean   rewrite Hermes provider/model config และล้าง model cache ทันที
   bda event   ส่ง event ระหว่าง session เช่น command ย่อย/งานย่อย
   bda stop    ปิด session และส่ง status=done/blocked/failed
 
@@ -681,6 +723,7 @@ async function main() {
   if (subcommand === "version" || subcommand === "--version" || subcommand === "-v") return printVersion();
   if (subcommand === "update") return updateStandard(args);
   if (subcommand === "config-status") return printConfigStatus();
+  if (subcommand === "config-clean") return printConfigClean();
   if (subcommand === "start") return start(config, args);
   if (subcommand === "event") return event(config, args);
   if (subcommand === "stop") return stop(config, args);

@@ -10,6 +10,7 @@ const temp = fs.mkdtempSync(path.join(os.tmpdir(), "bda-session-test-"));
 const home = path.join(temp, "home");
 const work = path.join(temp, "work");
 fs.mkdirSync(path.join(home, ".bda-skills"), { recursive: true });
+fs.mkdirSync(path.join(home, ".hermes"), { recursive: true });
 fs.mkdirSync(work, { recursive: true });
 fs.writeFileSync(path.join(home, ".bda-skills", "config.json"), JSON.stringify({
   employee_code: "BDA999",
@@ -17,6 +18,33 @@ fs.writeFileSync(path.join(home, ".bda-skills", "config.json"), JSON.stringify({
   work_event_url: "https://example.com/bda/work-events",
   api_key: "sk-test-redacted",
 }, null, 2));
+fs.writeFileSync(path.join(home, ".hermes", "config.yaml"), `model:
+  provider: bda
+  default: bda/qwen3-coder
+  context_length: 262144
+  max_tokens: 1024
+  compression_model: bda/gemma-4-26b-a4b-local
+providers:
+  bda:
+    name: BDA AI Gateway
+    api: https://ai.bda.co.th/v1
+    key_env: BDA_AI_ROUTER_API_KEY
+    models:
+      bda/qwen3-coder:
+        context_length: 32768
+      bda/qwen3.6-35b-a3b-local:
+        context_length: 65536
+      bda/gemma-4-26b-a4b-local:
+        context_length: 262144
+custom_providers:
+  - name: bda-router
+    base_url: https://ai.bda.co.th/v1
+agent:
+  system_prompt: |
+    You are running with BDA AI Dev Standard v0.10.3.
+    During an active session, treat bda-dev-*, bda-nondev-*, and bda-pm-* prefixes as real BDA work commands and send/prepare bda event.
+    Command catalog: bda-dev-debug, bda-dev-review, bda-dev-tdd, bda-dev-plan-discuss, bda-dev-plan-create, bda-dev-plan-execute, bda-dev-plan-review, bda-dev-plan-verify, bda-nondev-explore, bda-nondev-write, bda-pm-log, bda-pm-status, bda-pm-risk, bda-pm-followup, bda-pm-requirement, bda-pm-standup.
+`);
 
 function run(args, options = {}) {
   const result = spawnSync("node", [path.join(repo, "scripts/bda.mjs"), ...args], {
@@ -37,19 +65,39 @@ const help = run(["help"]);
 assert.match(help.stdout, /bda start/);
 assert.match(help.stdout, /bda-dev/);
 assert.doesNotMatch(help.stdout, /bda-dev-plan-execute/);
-assert.match(help.stdout, /bda-session\/0\.10\.6/);
+assert.match(help.stdout, /bda-session\/0\.10\.7/);
 assert.match(help.stdout, /bda update/);
+assert.match(help.stdout, /bda config-status/);
+assert.match(help.stdout, /bda config-clean/);
 
 const version = run(["version"]);
 const versionJson = JSON.parse(version.stdout);
 assert.equal(versionJson.ok, true);
-assert.equal(versionJson.cli_version, "0.10.6");
+assert.equal(versionJson.cli_version, "0.10.7");
 
 const updateDryRun = run(["update", "--dry-run"]);
 const updateJson = JSON.parse(updateDryRun.stdout);
 assert.equal(updateJson.ok, true);
 assert.equal(updateJson.action, "update");
 assert.equal(updateJson.dry_run, true);
+assert.equal(updateJson.hermes_config.config_paths[0].changed, true);
+assert.ok(updateJson.hermes_config.config_paths[0].before_models.includes("bda/qwen3-coder"));
+assert.ok(updateJson.hermes_config.config_paths[0].after_models.includes("bda/gpt-oss-20b-local"));
+assert.ok(!updateJson.hermes_config.config_paths[0].after_models.includes("bda/qwen3-coder"));
+assert.ok(!updateJson.hermes_config.config_paths[0].after_models.includes("bda/gemma-4-26b-a4b-local"));
+
+const configStatus = run(["config-status"]);
+const configStatusJson = JSON.parse(configStatus.stdout);
+assert.equal(configStatusJson.ok, true);
+assert.equal(configStatusJson.hermes_config.config_paths[0].changed, true);
+
+const configClean = run(["config-clean"]);
+const configCleanJson = JSON.parse(configClean.stdout);
+assert.equal(configCleanJson.ok, true);
+assert.equal(configCleanJson.hermes_config.config_paths[0].changed, true);
+const configStatusAfterClean = run(["config-status"]);
+const configStatusAfterCleanJson = JSON.parse(configStatusAfterClean.stdout);
+assert.equal(configStatusAfterCleanJson.hermes_config.config_paths[0].changed, false);
 
 const start = run([
   "start",
