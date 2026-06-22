@@ -8,6 +8,12 @@ This project uses Semantic Versioning: `MAJOR.MINOR.PATCH`.
 - MINOR: new commands, workflows, templates, adapters, or substantial behavior improvements
 - PATCH: clarifications, typo fixes, safer wording, and non-breaking documentation updates
 
+## [0.10.11] - 2026-06-22
+
+### Removed
+
+- Removed `bda/gpt-oss-20b-local` and `bda/kimi-k2.7-code-paid-cloud` from Hermes config because they are not part of the current production model set.
+
 ## [0.10.10] - 2026-06-22
 
 ### Added
