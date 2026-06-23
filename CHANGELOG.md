@@ -8,13 +8,20 @@ This project uses Semantic Versioning: `MAJOR.MINOR.PATCH`.
 - MINOR: new commands, workflows, templates, adapters, or substantial behavior improvements
 - PATCH: clarifications, typo fixes, safer wording, and non-breaking documentation updates
 
+## [0.10.17] - 2026-06-23
+
+### Fixed
+
+- Hotfixed `bda update` model sync after the 0.10.16 stale model regression: generated Hermes/thClaws configs now follow the current Gateway list with `bda/qwable-27b-local` and `bda/qwythos-9b-local`, not retired `auto-default/free-fast/qwen3.6` local aliases.
+- Updated local model context metadata for Qwable/Qwythos so thClaws and Hermes show the current lanes after update.
+
 ## [0.10.16] - 2026-06-23
 
 ### Fixed
 
-- `bda update`, `bda config-clean`, and `bda config-status` now read the current BDA Gateway `/v1/models` list before rewriting Hermes config, instead of using a hard-coded model list.
-- Synced thClaws `openai-compat` model catalogue from BDA Gateway when thClaws is installed, so pilot users do not see stale hand-written model rows.
-- Removed legacy `qwable/qwythos`, GPT-OSS, and Gemma entries from the generated Hermes config when the Gateway no longer publishes them.
+- `bda update`, `bda config-clean`, and `bda config-status` now read the current BDA Gateway `/v1/models` list before rewriting Hermes config, instead of using a stale hand-written model list.
+- Synced thClaws `openai-compat` model catalogue from BDA Gateway when thClaws is installed, so pilot users do not see stale model rows.
+- Restored current local model names `bda/qwable-27b-local` and `bda/qwythos-9b-local`; removed stale `auto-default/free-fast/qwen3.6` generated client entries.
 
 ## [0.10.15] - 2026-06-23
 

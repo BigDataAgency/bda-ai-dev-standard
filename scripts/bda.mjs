@@ -7,13 +7,12 @@ import readline from "node:readline/promises";
 import { execFileSync } from "node:child_process";
 
 const DEFAULT_URL = "https://example.com/bda/work-events";
-const SESSION_VERSION = "bda-session/0.10.16";
+const SESSION_VERSION = "bda-session/0.10.17";
 const STANDARD_REPO_URL = "https://github.com/BigDataAgency/bda-ai-dev-standard.git";
 const BDA_GATEWAY_BASE_URL = "https://ai.bda.co.th/v1";
 const FALLBACK_BDA_MODELS = [
-  "bda/auto-default-local",
-  "bda/free-fast-local",
-  "bda/qwen3.6-local",
+  "bda/qwable-27b-local",
+  "bda/qwythos-9b-local",
   "bda/deepseek-fast-paid-cloud",
   "bda/deepseek-paid-cloud",
   "bda/minimax-m3-paid-cloud",
@@ -61,22 +60,22 @@ const HERMES_CACHE_PATHS = [
 function bdaModelContextLength(model) {
   if (model.includes("qwen3.7") || model.includes("minimax")) return 262144;
   if (model.includes("deepseek") || model.includes("glm")) return 131072;
-  if (model.includes("qwen3.6")) return 65536;
+  if (model.includes("qwythos")) return 262144;
+  if (model.includes("qwable")) return 131072;
   return 65536;
 }
 
 function bdaModelMaxOutput(model) {
-  if (model.includes("qwen3.6")) return 2048;
   return 8192;
 }
 
 function buildHermesBdaConfigBlock(models = FALLBACK_BDA_MODELS) {
   const uniqueModels = [...new Set(models)].filter((model) => model.startsWith("bda/"));
-  const defaultModel = uniqueModels.includes("bda/auto-default-local")
-    ? "bda/auto-default-local"
-    : uniqueModels[0] || "bda/auto-default-local";
-  const compressionModel = uniqueModels.includes("bda/qwen3.6-local")
-    ? "bda/qwen3.6-local"
+  const defaultModel = uniqueModels.includes("bda/qwable-27b-local")
+    ? "bda/qwable-27b-local"
+    : uniqueModels[0] || "bda/qwable-27b-local";
+  const compressionModel = uniqueModels.includes("bda/qwythos-9b-local")
+    ? "bda/qwythos-9b-local"
     : defaultModel;
   const modelEntries = uniqueModels
     .map((model) => `      ${model}:\n        context_length: ${bdaModelContextLength(model)}`)
@@ -532,7 +531,7 @@ function removeTopLevelBlocks(yamlText, keys) {
 
 function removeLegacyAgentCommandCatalog(yamlText) {
   return yamlText
-    .replace(/You are running with BDA AI Dev Standard v[0-9.]+/g, "You are running with BDA AI Dev Standard v0.10.16")
+    .replace(/You are running with BDA AI Dev Standard v[0-9.]+/g, "You are running with BDA AI Dev Standard v0.10.17")
     .replace(/During an active session, treat bda-dev-\*, bda-nondev-\*, and bda-pm-\* prefixes as real BDA work commands and send\/prepare bda event\./g,
       "During an active session, use only the compact BDA commands: bda-dev, bda-nondev, and bda-pm. Send/prepare bda event for meaningful subtasks.")
     .replace(/Command catalog: bda-dev-debug, bda-dev-review, bda-dev-tdd, bda-dev-plan-discuss, bda-dev-plan-create, bda-dev-plan-execute, bda-dev-plan-review, bda-dev-plan-verify, bda-nondev-explore, bda-nondev-write, bda-pm-log, bda-pm-status, bda-pm-risk, bda-pm-followup, bda-pm-requirement, bda-pm-standup\./g,
