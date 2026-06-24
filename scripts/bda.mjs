@@ -31,6 +31,14 @@ const HERMES_CONFIG_PATHS = Array.from(new Set([
   process.env.APPDATA ? path.join(process.env.APPDATA, "hermes", "config.yaml") : "",
   process.env.APPDATA ? path.join(process.env.APPDATA, "Hermes", "config.yaml") : "",
 ].filter(Boolean)));
+const HERMES_ENV_PATHS = Array.from(new Set([
+  path.join(os.homedir(), ".hermes", ".env"),
+  path.join(MAC_HERMES_APP_SUPPORT, ".env"),
+  process.env.LOCALAPPDATA ? path.join(process.env.LOCALAPPDATA, "hermes", ".env") : "",
+  process.env.LOCALAPPDATA ? path.join(process.env.LOCALAPPDATA, "Hermes", ".env") : "",
+  process.env.APPDATA ? path.join(process.env.APPDATA, "hermes", ".env") : "",
+  process.env.APPDATA ? path.join(process.env.APPDATA, "Hermes", ".env") : "",
+].filter(Boolean)));
 const HERMES_CACHE_PATHS = [
   path.join(os.homedir(), ".hermes", "provider_models_cache.json"),
   path.join(os.homedir(), ".hermes", "models_dev_cache.json"),
@@ -184,6 +192,34 @@ function readDotEnv(filePath) {
   } catch {
     return {};
   }
+}
+
+function serializeDotEnv(values) {
+  return Object.entries(values)
+    .filter(([, value]) => value !== undefined && value !== null && String(value) !== "")
+    .map(([key, value]) => `${key}=${String(value).replace(/\r?\n/g, "")}`)
+    .join("\n") + "\n";
+}
+
+function mergeDotEnvText(text, values) {
+  const nextValues = { ...values };
+  const out = [];
+  for (const rawLine of String(text || "").replace(/^\uFEFF/, "").split(/\r?\n/)) {
+    if (!rawLine.trim()) continue;
+    const match = rawLine.match(/^(\s*(?:export\s+)?)([A-Za-z_][A-Za-z0-9_]*)(=)(.*)$/);
+    if (!match || !(match[2] in nextValues)) {
+      out.push(rawLine);
+      continue;
+    }
+    const value = nextValues[match[2]];
+    if (value !== undefined && value !== null && String(value) !== "") {
+      out.push(`${match[1]}${match[2]}=${String(value).replace(/\r?\n/g, "")}`);
+    }
+    delete nextValues[match[2]];
+  }
+  const appended = serializeDotEnv(nextValues).trimEnd();
+  if (appended) out.push(appended);
+  return out.join("\n").trimEnd() + "\n";
 }
 
 function workEventUrlFromBaseUrl(value) {
@@ -678,6 +714,57 @@ function cleanHermesConfig({ dryRun = false, models = modelsFromEnvOverride() } 
   return result;
 }
 
+function syncHermesEnv(config = {}, { dryRun = false } = {}) {
+  const apiKey = envOrConfig(
+    ["BDA_AI_ROUTER_API_KEY", "BDA_WORK_EVENT_API_KEY", "OPENAI_API_KEY"],
+    config,
+    ["api_key", "work_event_api_key"],
+  );
+  const values = {
+    BDA_AI_ROUTER_BASE_URL: BDA_GATEWAY_BASE_URL,
+    BDA_WORK_LOG_URL: workEventUrlFromBaseUrl(BDA_GATEWAY_BASE_URL),
+    BDA_AI_ROUTER_API_KEY: apiKey,
+    BDA_USED_BDA_GATEWAY: apiKey ? "true" : "",
+    BDA_AI_PROVIDER: apiKey ? "bda-gateway" : "",
+    BDA_AI_MODEL: envOrConfig(["BDA_AI_MODEL"], config, ["ai_model"], "bda/auto-default-local"),
+    BDA_EMPLOYEE_CODE: envOrConfig(["BDA_EMPLOYEE_CODE"], config, ["employee_code"]),
+    BDA_EMPLOYEE_GROUP: envOrConfig(["BDA_EMPLOYEE_GROUP"], config, ["employee_group", "group"]),
+  };
+  const targets = new Set(HERMES_ENV_PATHS.filter((envPath) => fs.existsSync(envPath)));
+  for (const configPath of HERMES_CONFIG_PATHS) {
+    if (fs.existsSync(configPath)) targets.add(path.join(path.dirname(configPath), ".env"));
+  }
+  if (!targets.size) targets.add(path.join(os.homedir(), ".hermes", ".env"));
+
+  const result = {
+    env_paths: [...targets].map((envPath) => ({
+      env_path: envPath,
+      exists: fs.existsSync(envPath),
+      changed: false,
+      backup_path: "",
+      wrote_key: Boolean(apiKey),
+    })),
+    changed: false,
+    wrote_key: Boolean(apiKey),
+  };
+  for (const entry of result.env_paths) {
+    const before = fs.existsSync(entry.env_path) ? fs.readFileSync(entry.env_path, "utf8") : "";
+    const after = mergeDotEnvText(before, values);
+    entry.changed = before !== after;
+    result.changed = result.changed || entry.changed;
+    if (entry.changed && !dryRun) {
+      ensureDir(path.dirname(entry.env_path));
+      if (entry.exists) {
+        const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+Z$/, "Z");
+        entry.backup_path = `${entry.env_path}.bak-${stamp}`;
+        fs.copyFileSync(entry.env_path, entry.backup_path);
+      }
+      fs.writeFileSync(entry.env_path, after);
+    }
+  }
+  return result;
+}
+
 function syncThclawsCatalogue(models = FALLBACK_BDA_MODELS, { dryRun = false } = {}) {
   const installed = fs.existsSync(THCLAWS_CONFIG_DIR)
     || fs.existsSync(path.join(os.homedir(), "bin", "thclaws"))
@@ -723,21 +810,24 @@ function syncThclawsCatalogue(models = FALLBACK_BDA_MODELS, { dryRun = false } =
 async function printConfigStatus(config = {}) {
   const models = await fetchBdaGatewayModels(config);
   const result = cleanHermesConfig({ dryRun: true, models });
+  const hermesEnv = syncHermesEnv(config, { dryRun: true });
   const thclaws = syncThclawsCatalogue(models, { dryRun: true });
-  console.log(JSON.stringify({ ok: true, action: "config-status", gateway_models: models, hermes_config: result, thclaws_config: thclaws }, null, 2));
+  console.log(JSON.stringify({ ok: true, action: "config-status", gateway_models: models, hermes_config: result, hermes_env: hermesEnv, thclaws_config: thclaws }, null, 2));
 }
 
 async function printConfigClean(config = {}) {
   const models = await fetchBdaGatewayModels(config);
   const result = cleanHermesConfig({ dryRun: false, models });
+  const hermesEnv = syncHermesEnv(config, { dryRun: false });
   const thclaws = syncThclawsCatalogue(models, { dryRun: false });
   console.log(JSON.stringify({
     ok: true,
     action: "config-clean",
     gateway_models: models,
     hermes_config: result,
+    hermes_env: hermesEnv,
     thclaws_config: thclaws,
-    note: "Restart Hermes Desktop after cleaning config/cache.",
+    note: "Restart Hermes Desktop after cleaning config/cache/env.",
   }, null, 2));
 }
 
