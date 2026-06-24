@@ -5,9 +5,10 @@ import os from "node:os";
 import path from "node:path";
 import readline from "node:readline/promises";
 import { execFileSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 
 const DEFAULT_URL = "https://example.com/bda/work-events";
-const SESSION_VERSION = "bda-session/0.10.17";
+const SESSION_VERSION = "bda-session/0.10.18";
 const STANDARD_REPO_URL = "https://github.com/BigDataAgency/bda-ai-dev-standard.git";
 const BDA_GATEWAY_BASE_URL = "https://ai.bda.co.th/v1";
 const FALLBACK_BDA_MODELS = [
@@ -424,7 +425,7 @@ function commandExists(command) {
 }
 
 function repoRoot() {
-  return path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
+  return path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 }
 
 async function updateStandard(args, config = {}) {
@@ -439,24 +440,23 @@ async function updateStandard(args, config = {}) {
     console.error(JSON.stringify({
       ok: false,
       error: "git is required for bda update",
-      hint: "Install git once, or run the latest BDA hotfix installer one last time.",
+      hint: "Do not reinstall BDA. Send this error to lead/admin with Get-Command bda and the current bda update output.",
       standard_dir: standardDir,
     }, null, 2));
     process.exit(2);
   }
 
-  const commands = hasGitRepo
-    ? [
-        ["git", ["-C", standardDir, "fetch", "--depth", "1", "origin", "main"]],
-        ["git", ["-C", standardDir, "reset", "--hard", "origin/main"]],
-        ["git", ["-C", standardDir, "clean", "-fd"]],
-      ]
-    : [
-        ["rm", ["-rf", standardDir]],
-        ["git", ["clone", "--depth", "1", STANDARD_REPO_URL, standardDir]],
-      ];
-
   if (!dryRun) {
+    if (!hasGitRepo) fs.rmSync(standardDir, { recursive: true, force: true });
+    const commands = hasGitRepo
+      ? [
+          ["git", ["-C", standardDir, "fetch", "--depth", "1", "origin", "main"]],
+          ["git", ["-C", standardDir, "reset", "--hard", "origin/main"]],
+          ["git", ["-C", standardDir, "clean", "-fd"]],
+        ]
+      : [
+          ["git", ["clone", "--depth", "1", STANDARD_REPO_URL, standardDir]],
+        ];
     for (const [command, commandArgs] of commands) {
       execFileSync(command, commandArgs, { stdio: "inherit" });
     }
@@ -531,7 +531,7 @@ function removeTopLevelBlocks(yamlText, keys) {
 
 function removeLegacyAgentCommandCatalog(yamlText) {
   return yamlText
-    .replace(/You are running with BDA AI Dev Standard v[0-9.]+/g, "You are running with BDA AI Dev Standard v0.10.17")
+    .replace(/You are running with BDA AI Dev Standard v[0-9.]+/g, "You are running with BDA AI Dev Standard v0.10.18")
     .replace(/During an active session, treat bda-dev-\*, bda-nondev-\*, and bda-pm-\* prefixes as real BDA work commands and send\/prepare bda event\./g,
       "During an active session, use only the compact BDA commands: bda-dev, bda-nondev, and bda-pm. Send/prepare bda event for meaningful subtasks.")
     .replace(/Command catalog: bda-dev-debug, bda-dev-review, bda-dev-tdd, bda-dev-plan-discuss, bda-dev-plan-create, bda-dev-plan-execute, bda-dev-plan-review, bda-dev-plan-verify, bda-nondev-explore, bda-nondev-write, bda-pm-log, bda-pm-status, bda-pm-risk, bda-pm-followup, bda-pm-requirement, bda-pm-standup\./g,

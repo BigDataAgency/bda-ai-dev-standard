@@ -8,6 +8,14 @@ This project uses Semantic Versioning: `MAJOR.MINOR.PATCH`.
 - MINOR: new commands, workflows, templates, adapters, or substantial behavior improvements
 - PATCH: clarifications, typo fixes, safer wording, and non-breaking documentation updates
 
+## [0.10.18] - 2026-06-24
+
+### Fixed
+
+- Fixed `bda update` on Windows when the CLI is launched from a `file:///C:/...` path. The updater now resolves its own script path with Node's `fileURLToPath`, preventing invalid clone targets such as `C:\C:\Users\...\ .bda-ai-dev-standard`.
+- Replaced the shell-only `rm -rf` cleanup path with Node's cross-platform `fs.rmSync` before cloning a missing standard repo.
+- Clarified the missing-git update hint: employees should not reinstall BDA themselves and should send the error plus command path evidence to lead/admin.
+
 ## [0.10.17] - 2026-06-23
 
 ### Fixed
