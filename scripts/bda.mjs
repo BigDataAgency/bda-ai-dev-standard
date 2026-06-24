@@ -154,11 +154,84 @@ function parseArgs(argv) {
 function readJson(filePath) {
   try {
     if (!fs.existsSync(filePath)) return {};
-    const data = JSON.parse(fs.readFileSync(filePath, "utf8"));
+    const data = JSON.parse(fs.readFileSync(filePath, "utf8").replace(/^\uFEFF/, ""));
     return data && typeof data === "object" ? data : {};
   } catch {
     return {};
   }
+}
+
+function readDotEnv(filePath) {
+  try {
+    if (!fs.existsSync(filePath)) return {};
+    const out = {};
+    const text = fs.readFileSync(filePath, "utf8").replace(/^\uFEFF/, "");
+    for (const rawLine of text.split(/\r?\n/)) {
+      const line = rawLine.trim();
+      if (!line || line.startsWith("#")) continue;
+      const match = line.match(/^(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)=(.*)$/);
+      if (!match) continue;
+      let value = match[2].trim();
+      if (
+        (value.startsWith('"') && value.endsWith('"')) ||
+        (value.startsWith("'") && value.endsWith("'"))
+      ) {
+        value = value.slice(1, -1);
+      }
+      out[match[1]] = value;
+    }
+    return out;
+  } catch {
+    return {};
+  }
+}
+
+function workEventUrlFromBaseUrl(value) {
+  const text = String(value || "").trim();
+  if (!text) return "";
+  try {
+    const url = new URL(text);
+    url.pathname = url.pathname.replace(/\/v1\/?$/, "/bda/work-events");
+    if (!url.pathname.endsWith("/bda/work-events")) url.pathname = "/bda/work-events";
+    url.search = "";
+    url.hash = "";
+    return url.toString();
+  } catch {
+    return "";
+  }
+}
+
+function configFromEnvMap(envMap) {
+  const baseUrl = envMap.BDA_AI_ROUTER_BASE_URL || envMap.OPENAI_BASE_URL || "";
+  return {
+    employee_code: envMap.BDA_EMPLOYEE_CODE,
+    employee_group: envMap.BDA_EMPLOYEE_GROUP,
+    work_event_url: envMap.BDA_AI_WORK_EVENT_URL || envMap.BDA_WORK_LOG_URL || workEventUrlFromBaseUrl(baseUrl),
+    api_key: envMap.BDA_AI_ROUTER_API_KEY || envMap.BDA_WORK_EVENT_API_KEY || envMap.OPENAI_API_KEY,
+    ai_provider: envMap.BDA_AI_PROVIDER || (baseUrl ? "bda-gateway" : ""),
+    ai_model: envMap.BDA_AI_MODEL,
+    used_bda_gateway: envMap.BDA_USED_BDA_GATEWAY,
+  };
+}
+
+function mergeConfig(...configs) {
+  const out = {};
+  for (const config of configs) {
+    for (const [key, value] of Object.entries(config || {})) {
+      if (value === undefined || value === null || value === "") continue;
+      out[key] = value;
+    }
+  }
+  if (
+    out.api_key &&
+    out.work_event_url &&
+    out.work_event_url !== DEFAULT_URL &&
+    out.used_bda_gateway === undefined
+  ) {
+    out.used_bda_gateway = true;
+  }
+  if (out.api_key && !out.ai_provider) out.ai_provider = "bda-gateway";
+  return out;
 }
 
 function ensureDir(dirPath) {
@@ -166,9 +239,13 @@ function ensureDir(dirPath) {
 }
 
 function loadConfig() {
-  const globalConfig = readJson(path.join(os.homedir(), ".bda-skills", "config.json"));
+  const home = os.homedir();
+  const processEnvConfig = configFromEnvMap(process.env);
+  const hermesEnvConfig = configFromEnvMap(readDotEnv(path.join(home, ".hermes", ".env")));
+  const globalConfig = readJson(path.join(home, ".bda-skills", "config.json"));
+  const installedConfig = readJson(path.join(repoRoot(), ".bda-skills", "config.json"));
   const projectConfig = readJson(path.join(process.cwd(), ".bda-skills", "config.json"));
-  return { ...globalConfig, ...projectConfig };
+  return mergeConfig(hermesEnvConfig, globalConfig, installedConfig, projectConfig, processEnvConfig);
 }
 
 function configDir(config) {

@@ -47,9 +47,11 @@ agent:
 `);
 
 function run(args, options = {}) {
+  const runHome = options.home || home;
+  const runWork = options.work || work;
   const result = spawnSync("node", [path.join(repo, "scripts/bda.mjs"), ...args], {
-    cwd: work,
-    env: { ...process.env, HOME: home },
+    cwd: runWork,
+    env: { ...process.env, HOME: runHome, USERPROFILE: runHome },
     text: true,
     encoding: "utf8",
   });
@@ -128,6 +130,34 @@ assert.equal(startJson.session.command, "bda-dev");
 assert.equal(startJson.session.work_type, "debug");
 assert.equal(startJson.send_result.dry_run, true);
 const activeSessionId = startJson.session.session_id;
+
+const hermesOnlyHome = path.join(temp, "hermes-only-home");
+const hermesOnlyWork = path.join(temp, "hermes-only-work");
+fs.mkdirSync(path.join(hermesOnlyHome, ".hermes"), { recursive: true });
+fs.mkdirSync(hermesOnlyWork, { recursive: true });
+fs.writeFileSync(path.join(hermesOnlyHome, ".hermes", ".env"), [
+  "BDA_EMPLOYEE_CODE=BDA777",
+  "BDA_EMPLOYEE_GROUP=dev",
+  "BDA_AI_ROUTER_BASE_URL=https://ai.example.test/v1",
+  "BDA_AI_ROUTER_API_KEY=sk-hermes-env-test",
+  "BDA_AI_MODEL=bda/dev",
+  "",
+].join("\n"));
+const hermesStart = run([
+  "start",
+  "--project", "HermesEnv",
+  "--task", "debug metadata binding",
+  "--command", "bda-dev",
+  "--work-type", "debug",
+  "--dry-run",
+], { home: hermesOnlyHome, work: hermesOnlyWork });
+const hermesStartJson = JSON.parse(hermesStart.stdout);
+assert.equal(hermesStartJson.session.employee_code, "BDA777");
+assert.equal(hermesStartJson.session.ai_provider, "bda-gateway");
+assert.equal(hermesStartJson.session.ai_model, "bda/dev");
+assert.equal(hermesStartJson.session.used_bda_gateway, true);
+assert.equal(hermesStartJson.send_result.dry_run, true);
+assert.equal(hermesStartJson.send_result.reason, "dry-run requested");
 
 const current = run(["current"]);
 assert.equal(JSON.parse(current.stdout).active, true);
