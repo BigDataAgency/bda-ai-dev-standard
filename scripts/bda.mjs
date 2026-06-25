@@ -8,7 +8,7 @@ import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const DEFAULT_URL = "https://example.com/bda/work-events";
-const SESSION_VERSION = "bda-session/0.10.20";
+const SESSION_VERSION = "bda-session/0.11.1";
 const STANDARD_REPO_URL = "https://github.com/BigDataAgency/bda-ai-dev-standard.git";
 const BDA_GATEWAY_BASE_URL = "https://ai.bda.co.th/v1";
 const FALLBACK_BDA_MODELS = [
@@ -574,6 +574,16 @@ function archiveSupersededSession(config, session, replacementSessionId) {
   return filePath;
 }
 
+function applyServerSessionResult(session, result) {
+  const serverSessionId = String(result?.session_id || "").trim();
+  if (!serverSessionId || serverSessionId === session.session_id) return false;
+  session.client_session_id = session.session_id;
+  session.session_id = serverSessionId;
+  session.session_id_source = result.session_id_source || (result.deduped_start ? "server_deduped_start" : "server");
+  session.server_deduped_start = Boolean(result.deduped_start);
+  return true;
+}
+
 function printVersion() {
   console.log(JSON.stringify({
     ok: true,
@@ -699,7 +709,7 @@ function removeTopLevelBlocks(yamlText, keys) {
 
 function removeLegacyAgentCommandCatalog(yamlText) {
   return yamlText
-    .replace(/You are running with BDA AI Dev Standard v[0-9.]+/g, "You are running with BDA AI Dev Standard v0.10.20")
+    .replace(/You are running with BDA AI Dev Standard v[0-9.]+/g, "You are running with BDA AI Dev Standard v0.11.1")
     .replace(/During an active session, treat bda-dev-\*, bda-nondev-\*, and bda-pm-\* prefixes as real BDA work commands and send\/prepare bda event\./g,
       "During an active session, use only the compact BDA commands: bda-dev, bda-nondev, and bda-pm. Send/prepare bda event for meaningful subtasks.")
     .replace(/Command catalog: bda-dev-debug, bda-dev-review, bda-dev-tdd, bda-dev-plan-discuss, bda-dev-plan-create, bda-dev-plan-execute, bda-dev-plan-review, bda-dev-plan-verify, bda-nondev-explore, bda-nondev-write, bda-pm-log, bda-pm-status, bda-pm-risk, bda-pm-followup, bda-pm-requirement, bda-pm-standup\./g,
@@ -988,6 +998,9 @@ async function start(config, args) {
   }
   const filePath = saveSession(config, session);
   const result = await sendEvent(config, { ...event, status: "started" }, args);
+  if (applyServerSessionResult(session, result)) {
+    saveSession(config, session);
+  }
   console.log(JSON.stringify({ ok: true, action: "start", session_file: filePath, superseded_session: supersededSession, session, send_result: result }, null, 2));
 }
 
@@ -1009,6 +1022,9 @@ async function event(config, args) {
   session.events.push({ at: now, status: payload.status, command: payload.command, task_summary: payload.task_summary });
   saveSession(config, session);
   const result = await sendEvent(config, payload, args);
+  if (applyServerSessionResult(session, result)) {
+    saveSession(config, session);
+  }
   console.log(JSON.stringify({ ok: true, action: "event", event: payload, send_result: result }, null, 2));
 }
 
@@ -1047,6 +1063,11 @@ async function stop(config, args) {
   session.events.push({ at: stoppedAt, status: payload.status, command: payload.command, task_summary: payload.task_summary });
   const archived = archiveSession(config, session);
   const result = await sendEvent(config, payload, args);
+  if (applyServerSessionResult(session, result)) {
+    const syncedArchived = archiveSession(config, session);
+    console.log(JSON.stringify({ ok: true, action: "stop", archived_session: syncedArchived, event: payload, send_result: result }, null, 2));
+    return;
+  }
   console.log(JSON.stringify({ ok: true, action: "stop", archived_session: archived, event: payload, send_result: result }, null, 2));
 }
 

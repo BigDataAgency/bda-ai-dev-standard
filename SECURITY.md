@@ -4,11 +4,14 @@
 
 This repository is a public standards repository. It contains BDA AI Dev Standard documentation, templates, prompts, command adapters, schemas, and smoke checks only.
 
+The repository may include local/dry-run CLI client code and OpenAI-compatible gateway examples, but it must not include any secret or unauthenticated path to BDA private infrastructure. External users can run the standard with their own local models, model providers, or private gateways; see `docs/open-source-ai-dev-deployment-guide.md`.
+
 It must not contain:
 
 - Production BDA or InnoHub endpoints.
 - Production credentials, bearer tokens, tenant secrets, API keys, database service keys, private keys, cookies, or session material.
 - Automatic production-ingest code paths that send public-repository content into InnoHub by default.
+- BDA private GPU hostnames, Tailscale IPs, LiteLLM master keys, paid-provider keys, or employee-specific gateway config.
 - Customer data, personal data, screenshots with unmasked sensitive data, or operational secrets.
 
 ## Default operating mode

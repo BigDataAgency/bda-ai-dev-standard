@@ -9,6 +9,13 @@
 4. ใช้ `commands/verify-work.md`
 5. ส่ง `commands/handoff-report.md`
 
+## AI session/model guardrails
+- เริ่มจาก local/auto/free-fast ถ้างานยังเป็น mechanical หรือแก้เฉพาะจุด
+- ใช้ paid model ได้เมื่อมีเหตุผล เช่น logic ซับซ้อน, bug ตามยาก, cross-file reasoning, หรือ final review สำคัญ
+- ก่อน switch model ให้สรุป current state จากไฟล์จริง/diff/test ไม่พึ่ง chat history อย่างเดียว
+- ห้ามให้ AI/tool `bda stop` เองหลังจบ step ย่อย ให้ปิด session เฉพาะตอน handoff หรือเมื่อผู้ใช้สั่ง
+- ถ้า context ใกล้เต็ม ให้ compact เป็น bullet ของ facts, files changed, remaining issues และ evidence แล้วทำต่อจากไฟล์จริง
+
 ## Evidence
 - command ที่รัน
 - result/log/screenshot/link

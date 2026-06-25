@@ -22,6 +22,24 @@
 - ห้ามเพิ่ม speculative abstraction, configuration, dependency, หรือ feature ที่ผู้ใช้ไม่ได้ขอ
 - ถ้ามี assumption/ambiguity ให้หยุดถามเฉพาะเมื่อมีผลต่อ scope, data safety, security, หรือ correctness; ถ้าไม่กระทบให้ระบุ assumption แล้วทำต่อแบบเล็กที่สุด
 
+## 3.1 BDA AI Session and Model Use
+- ห้าม AI/tool เรียก `bda start` หรือ `bda stop` เองโดยไม่อยู่ในคำสั่งหรือ flow ที่ผู้ใช้ยืนยันแล้ว
+- `bda start` ต้องมี project, task_summary, command/tool, employee_code และ session_id ที่ trace กลับไปยังงานจริงได้
+- `bda stop` ต้องปิด session เดิมเท่านั้น ห้ามสร้าง session ใหม่ตอน stop และห้าม stop อัตโนมัติแค่เพราะทำ step หนึ่งเสร็จ
+- หลังเปิด hybrid local GPU + paid cloud ให้ยึด `docs/hybrid-ai-usage-discipline.md` เป็นกติกาใช้งานประจำวัน
+- ห้าม scan codebase ทั้งหมดซ้ำใน session เดิม; ให้ scan จำกัดครั้งเดียวต่อ task แล้วใช้ targeted search ตาม path/module/error string
+- ห้ามถามงานกว้าง เช่น "ดูให้หน่อย", "ทำต่อ", "แก้ให้หมด" โดยไม่มี path/error/success criteria/command ที่ต้องใช้
+- ห้ามเปิดหลาย agent สำหรับ repo/task เดียวกันพร้อมกัน เพราะทำให้ queue และ paid overflow สูงขึ้น
+- ห้ามใช้ session เก่าข้ามวันสำหรับงานจริง ถ้าต้องทำต่อให้เริ่มจาก handoff/session note/diff แล้วเปิด session ใหม่
+- งานเล็ก งานกลไก หรืองานแก้เฉพาะจุด ให้เริ่มที่ local/auto/free-fast ก่อน
+- paid model ใช้ได้เมื่อ task ซับซ้อน, ต้องอ่านหลายไฟล์, ต้องวิเคราะห์ root cause ยาก, เกี่ยวกับ security/data model หรือใช้เป็น final review แต่ต้องระบุเหตุผลและ success criteria
+- paid model ไม่ใช่ default ถ้า switch เป็น paid ต้องบันทึกเหตุผลใน handoff หรือ work event
+- AI subscription ภายนอกที่ไม่ได้ผ่าน BDA Gateway ไม่ใช่ path หลักของบริษัท เพราะวัด usage/cost/value ไม่ครบและมีปัญหาด้านการจ่ายเงิน/ภาษี ให้ใช้เฉพาะกรณี legacy/emergency และต้องบันทึกใน `bda start` ว่า `used_bda_gateway=false`
+- ห้ามเชื่อ self-report ของ AI ว่า “แก้แล้ว/ทดสอบแล้ว” โดยไม่มีหลักฐานจากไฟล์จริง, diff, build, lint, test หรือ manual check
+- เมื่อ context ใกล้เต็ม ให้สรุปสถานะปัจจุบันเป็นไฟล์/ประเด็น/ข้อเท็จจริงที่ตรวจแล้ว และไปต่อจากไฟล์จริง ไม่ paste repo/log/chat history ทั้งก้อน
+- ก่อน switch model หรือหลัง compact context ต้อง reconstruct จากไฟล์จริง, diff และผลทดสอบ ไม่เดาจากความจำของโมเดล
+- เมื่อเจอ timeout/connection/model error ให้บันทึก model เวลา error และ fallback ไป model ที่เสถียรกว่าแทนการ retry ยาวโดยไม่มีประโยชน์
+
 ## 4. Verify
 - ใช้ test/lint/build/manual check จริง
 - ถ้ารันไม่ได้ ให้บอก blocker และทางเลือกตรวจ

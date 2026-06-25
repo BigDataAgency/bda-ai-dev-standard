@@ -9,6 +9,14 @@
 4. ใช้ `commands/verify-work.md`
 5. ส่ง `commands/handoff-report.md`
 
+## AI session/model guardrails
+- แบ่งงานเป็น phase สั้น และ checkpoint หลังแต่ละ phase ด้วย diff/build/test หรือ manual evidence
+- งาน cross-repo, data model ใหม่, หรือ logic ซับซ้อน ใช้ paid model ได้ แต่ต้องระบุเหตุผลและ success criteria ก่อน
+- งาน implementation ยาวให้หลีกเลี่ยงการส่ง context ทั้ง repo ให้แนบเฉพาะไฟล์/patch/log ที่เกี่ยวข้องต่อ phase
+- ก่อน compact หรือ switch model ต้องสร้าง current-state note: goal, files touched, decisions, failing tests, next step
+- ห้าม AI/tool `bda start` หรือ `bda stop` เองนอก flow ที่ผู้ใช้ยืนยัน; step done ไม่เท่ากับ session stop
+- Verification ต้องดู code/diff/test จริง ห้ามใช้ self-report ของ model เป็นหลักฐาน
+
 ## Evidence
 - command ที่รัน
 - result/log/screenshot/link

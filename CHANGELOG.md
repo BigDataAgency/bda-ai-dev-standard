@@ -8,6 +8,17 @@ This project uses Semantic Versioning: `MAJOR.MINOR.PATCH`.
 - MINOR: new commands, workflows, templates, adapters, or substantial behavior improvements
 - PATCH: clarifications, typo fixes, safer wording, and non-breaking documentation updates
 
+## [0.11.1] - 2026-06-25
+
+### Fixed
+
+- Synced local session ids from the gateway response when the server deduplicates a repeated `bda start`, preventing duplicate admin sessions and split spend tracking.
+
+### Added
+
+- Added `docs/local-llm-product-learning-log.md` to preserve product lessons from Local LLM/A40/hybrid rollout incidents and usage patterns.
+- Kept the public repo as the source of truth for `bda help` and `bda update` guidance while carrying forward the 0.10.x hotfix line.
+
 ## [0.10.20] - 2026-06-25
 
 ### Fixed

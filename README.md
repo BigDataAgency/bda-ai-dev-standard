@@ -1,6 +1,6 @@
 # BDA AI Dev Standard
 
-Version: `0.10.18`
+Version: `0.11.1`
 License: MIT
 
 มาตรฐานกลางสำหรับการทำงานร่วมกับ AI ในงานพัฒนา ซ่อมบั๊ก ตรวจโค้ด เขียนเอกสาร งาน Obsidian งาน Performance และงานติดตามทีมของ BDA
@@ -11,7 +11,7 @@ License: MIT
 
 BDA AI Dev Standard ใช้ Semantic Versioning: `MAJOR.MINOR.PATCH`
 
-- Current version: `0.10.18`
+- Current version: `0.11.1`
 - ดูประวัติการเปลี่ยนแปลงที่ `CHANGELOG.md`
 - เลข version หลักอยู่ใน `VERSION`
 - ทุก update สำคัญต้องเปลี่ยน version ใน repo นี้ก่อน rollout
@@ -27,6 +27,10 @@ BDA AI Dev Standard ใช้ Semantic Versioning: `MAJOR.MINOR.PATCH`
 5. ให้ AI ทำงานตาม command เฉพาะ เช่น `build-feature`, `fix-bug`, `write-document`
 6. ตรวจหลักฐานด้วย `commands/verify-work.md` และ policy ใน `policies/`
 7. ส่ง handoff ด้วย `commands/handoff-report.md`
+
+สำหรับทีมที่ใช้ hybrid local GPU + paid cloud ให้ใช้กติกาลด queue และลด prompt ซ้ำใน `docs/hybrid-ai-usage-discipline.md`
+
+บทเรียน product จากการใช้ Local LLM จริง รวมถึงความต่างระหว่างองค์กรที่มี dev team และ non-dev team อยู่ที่ `docs/local-llm-product-learning-log.md`
 
 ## เลือกตามขนาดงาน
 

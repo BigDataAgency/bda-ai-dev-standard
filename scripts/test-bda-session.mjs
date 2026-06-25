@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 import assert from "node:assert/strict";
 import fs from "node:fs";
+import http from "node:http";
 import os from "node:os";
 import path from "node:path";
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 
 const repo = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const temp = fs.mkdtempSync(path.join(os.tmpdir(), "bda-session-test-"));
@@ -63,11 +64,41 @@ function run(args, options = {}) {
   return result;
 }
 
+function runAsync(args, options = {}) {
+  const runHome = options.home || home;
+  const runWork = options.work || work;
+  return new Promise((resolve, reject) => {
+    const child = spawn("node", [path.join(repo, "scripts/bda.mjs"), ...args], {
+      cwd: runWork,
+      env: { ...process.env, HOME: runHome, USERPROFILE: runHome },
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    let stdout = "";
+    let stderr = "";
+    child.stdout.setEncoding("utf8");
+    child.stderr.setEncoding("utf8");
+    child.stdout.on("data", (chunk) => {
+      stdout += chunk;
+    });
+    child.stderr.on("data", (chunk) => {
+      stderr += chunk;
+    });
+    child.on("error", reject);
+    child.on("close", (status) => {
+      if (status !== 0) {
+        reject(new Error(stdout + stderr));
+        return;
+      }
+      resolve({ stdout, stderr, status });
+    });
+  });
+}
+
 const help = run(["help"]);
 assert.match(help.stdout, /bda start/);
 assert.match(help.stdout, /bda-dev/);
 assert.doesNotMatch(help.stdout, /bda-dev-plan-execute/);
-assert.match(help.stdout, /bda-session\/0\.10\.20/);
+assert.match(help.stdout, /bda-session\/0\.11\.1/);
 assert.match(help.stdout, /bda update/);
 assert.match(help.stdout, /bda config-status/);
 assert.match(help.stdout, /bda config-clean/);
@@ -75,7 +106,7 @@ assert.match(help.stdout, /bda config-clean/);
 const version = run(["version"]);
 const versionJson = JSON.parse(version.stdout);
 assert.equal(versionJson.ok, true);
-assert.equal(versionJson.cli_version, "0.10.20");
+assert.equal(versionJson.cli_version, "0.11.1");
 
 const updateDryRun = run(["update", "--dry-run"]);
 const updateJson = JSON.parse(updateDryRun.stdout);
@@ -246,5 +277,42 @@ assert.equal(stopJson.event.command, "bda stop");
 assert.equal(stopJson.event.session_id, activeSessionId);
 assert.equal(fs.existsSync(path.join(work, ".bda-skills", "current-session.json")), false);
 assert.equal(fs.existsSync(stopJson.archived_session), true);
+
+const server = http.createServer((request, response) => {
+  let body = "";
+  request.setEncoding("utf8");
+  request.on("data", (chunk) => {
+    body += chunk;
+  });
+  request.on("end", () => {
+    const payload = JSON.parse(body || "{}");
+    response.setHeader("content-type", "application/json");
+    response.end(JSON.stringify({
+      ok: true,
+      event_file: "test.jsonl",
+      session_id: "server-reused-session",
+      client_session_id: payload.session_id || "",
+      deduped_start: true,
+      session_id_source: "server_deduped_start",
+    }));
+  });
+});
+await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+try {
+  const address = server.address();
+  const synced = await runAsync([
+    "start",
+    "--project", "BDA-InnoHub",
+    "--task", "server dedupe",
+    "--command", "bda-dev",
+    "--url", `http://127.0.0.1:${address.port}/bda/work-events`,
+  ]);
+  const syncedJson = JSON.parse(synced.stdout);
+  assert.equal(syncedJson.session.session_id, "server-reused-session");
+  assert.equal(syncedJson.session.server_deduped_start, true);
+  assert.equal(JSON.parse(fs.readFileSync(path.join(home, ".bda-skills", "current-session.json"), "utf8")).session_id, "server-reused-session");
+} finally {
+  await new Promise((resolve) => server.close(resolve));
+}
 
 console.log("bda session CLI smoke test passed");
