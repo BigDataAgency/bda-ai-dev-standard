@@ -63,6 +63,15 @@ Normal `bda doctor --fix` / `bda hermes-reset` should archive only known high-ri
 - `~/Library/Application Support/Hermes/Local Storage`
 - `~/Library/Application Support/Hermes/IndexedDB`
 
+The CLI must also enforce this at runtime. If a future change accidentally adds a whole app/profile root to the cleanup list, the command must skip it under `skipped_for_safety` instead of moving it.
+
+Forbidden whole-root archive targets include:
+
+- `~/.hermes`
+- `~/Library/Application Support/Hermes`
+- `~/Library/Application Support/hermes`
+- `/Applications/Hermes.app`
+
 Only use a full folder move when a lead explicitly approves it during an incident.
 When doing a full move, tell the employee first that old Hermes UI sessions/chats will disappear from the app but are archived, not permanently deleted.
 

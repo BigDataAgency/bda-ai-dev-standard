@@ -15,6 +15,7 @@ This project uses Semantic Versioning: `MAJOR.MINOR.PATCH`.
 - Added `bda doctor` so employees can inspect BDA config, active session state, Hermes hidden context size, and local request dumps without exposing keys or prompt content.
 - Added `bda doctor --fix`, `bda hermes-reset`, and `bda hermes-clean-context --yes` to archive stale Hermes state safely while preserving `config.yaml`, `.env`, and BDA employee config.
 - Added Hermes state diagnostics for `~/.hermes`, macOS Application Support paths, Windows LocalAppData/Roaming paths, request dump counts, and large-context warning thresholds.
+- Added a hard safety guard so Hermes cleanup refuses to archive whole Hermes app/profile roots such as `~/Library/Application Support/Hermes`, `~/.hermes`, or `/Applications/Hermes.app`.
 
 ### Fixed
 

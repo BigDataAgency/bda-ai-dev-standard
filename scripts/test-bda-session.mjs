@@ -174,7 +174,10 @@ assert.equal(hermesResetJson.ok, true);
 assert.equal(hermesResetJson.action, "hermes-reset");
 assert.equal(fs.existsSync(path.join(home, ".hermes", "state.db")), false);
 assert.equal(fs.existsSync(path.join(home, ".hermes", "sessions")), false);
+assert.equal(fs.existsSync(path.join(home, ".hermes")), true);
 assert.equal(fs.existsSync(path.join(home, ".hermes", "config.yaml")), true);
+assert.equal(hermesResetJson.hermes_state.moved.some((entry) => entry.from === path.join(home, ".hermes")), false);
+assert.equal(hermesResetJson.hermes_state.moved.some((entry) => entry.from.endsWith("Hermes.app")), false);
 assert.ok(hermesResetJson.hermes_state.moved.some((entry) => entry.from.endsWith(path.join(".hermes", "state.db"))));
 fs.writeFileSync(path.join(home, ".hermes", "state.db"), "stale state again\n");
 const hermesCleanContext = run(["hermes-clean-context", "--yes"]);
@@ -187,7 +190,10 @@ const doctorFix = run(["doctor", "--fix"]);
 const doctorFixJson = JSON.parse(doctorFix.stdout);
 assert.equal(doctorFixJson.action, "doctor");
 assert.equal(fs.existsSync(path.join(home, ".hermes", "state.db")), false);
+assert.equal(fs.existsSync(path.join(home, ".hermes")), true);
 assert.equal(fs.existsSync(path.join(home, ".hermes", "config.yaml")), true);
+assert.equal(doctorFixJson.fix_result.moved.some((entry) => entry.from === path.join(home, ".hermes")), false);
+assert.equal(doctorFixJson.fix_result.moved.some((entry) => entry.from.endsWith("Hermes.app")), false);
 
 const start = run([
   "start",

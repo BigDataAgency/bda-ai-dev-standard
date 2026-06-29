@@ -114,6 +114,11 @@ const HERMES_STATE_ROOTS = Array.from(new Set([
 const HERMES_STATE_WARN_BYTES = 100 * 1024 * 1024;
 const HERMES_STATE_CRITICAL_BYTES = 500 * 1024 * 1024;
 const HERMES_REQUEST_DUMP_WARN_BYTES = 5 * 1024 * 1024;
+const FORBIDDEN_HERMES_ARCHIVE_PATHS = Array.from(new Set([
+  ...HERMES_STATE_ROOTS,
+  "/Applications/Hermes.app",
+  path.join(os.homedir(), "Applications", "Hermes.app"),
+].filter(Boolean).map((entry) => path.resolve(entry))));
 
 function bdaModelContextLength(model) {
   if (model.includes("qwen3.7") || model.includes("minimax")) return 262144;
@@ -827,6 +832,10 @@ function safeBackupName(filePath) {
     .replace(/^_+/, "");
 }
 
+function isForbiddenHermesArchivePath(filePath) {
+  return FORBIDDEN_HERMES_ARCHIVE_PATHS.includes(path.resolve(filePath));
+}
+
 function moveHermesState(config = {}, { dryRun = false } = {}) {
   const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+Z$/, "Z");
   const backupDir = path.join(configDir(config), "hermes-state-backups", stamp);
@@ -834,11 +843,19 @@ function moveHermesState(config = {}, { dryRun = false } = {}) {
     backup_dir: backupDir,
     moved: [],
     missing: [],
+    skipped_for_safety: [],
     errors: [],
     dry_run: dryRun,
   };
 
   for (const statePath of HERMES_STATE_PATHS) {
+    if (isForbiddenHermesArchivePath(statePath)) {
+      result.skipped_for_safety.push({
+        path: statePath,
+        reason: "Refusing to archive whole Hermes app/profile root. Only targeted state paths may be archived.",
+      });
+      continue;
+    }
     if (!fs.existsSync(statePath)) {
       result.missing.push(statePath);
       continue;
