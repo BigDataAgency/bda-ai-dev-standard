@@ -8,6 +8,16 @@ This project uses Semantic Versioning: `MAJOR.MINOR.PATCH`.
 - MINOR: new commands, workflows, templates, adapters, or substantial behavior improvements
 - PATCH: clarifications, typo fixes, safer wording, and non-breaking documentation updates
 
+## [0.11.5] - 2026-06-29
+
+### Added
+
+- Added `bda_inventory` reporting from `bda update` and `bda doctor` so AdminA40/Grafana can distinguish the last installer package from the current installed CLI/standard version.
+
+### Fixed
+
+- Prevented AdminA40 install status from looking stale after a successful `bda update`; dashboards can now use the latest inventory event for current version and keep installer version as a separate audit field.
+
 ## [0.11.4] - 2026-06-29
 
 ### Added

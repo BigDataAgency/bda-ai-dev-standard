@@ -107,6 +107,8 @@ bda doctor --fix
 bda help
 ```
 
+`bda update` and `bda doctor` send a best-effort `bda_inventory` event after they run. AdminA40/Grafana should use the latest inventory event for the current CLI/standard version, and keep installer version as a separate audit field. Do not treat an old installer event, such as a safe-context 0.10.x installer, as proof that the machine is still on that CLI version after `bda update` succeeds.
+
 ## Safety Rule
 
 `bda doctor --fix` and `bda hermes-reset` must never archive whole app/profile roots:

@@ -8,7 +8,7 @@ import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const DEFAULT_URL = "https://example.com/bda/work-events";
-const SESSION_VERSION = "bda-session/0.11.4";
+const SESSION_VERSION = "bda-session/0.11.5";
 const STANDARD_REPO_URL = "https://github.com/BigDataAgency/bda-ai-dev-standard.git";
 const BDA_GATEWAY_BASE_URL = "https://ai.bda.co.th/v1";
 const FALLBACK_BDA_MODELS = [
@@ -560,6 +560,46 @@ function baseEvent(config, args, session = {}) {
   };
 }
 
+function cliVersion() {
+  return SESSION_VERSION.replace(/^bda-session\//, "");
+}
+
+async function sendInventoryEvent(config, args = {}, data = {}) {
+  const source = data.source || "bda";
+  const utilityCommand = data.utility_command || source;
+  const event = {
+    ...baseEvent(config, {
+      project: args.project || "BDA-AI-Installer",
+      task: data.task_summary || `BDA inventory report from ${source}`,
+      command: "bda-nondev",
+      work_type: "operation",
+      status: "done",
+      tool: "bda-ai-dev-standard",
+      session_id: buildSessionId(
+        config.employee_code || envOrConfig(["BDA_EMPLOYEE_CODE"], config, ["employee_code"]) || "unknown",
+        "BDA-AI-Installer",
+        "bda-inventory",
+      ),
+    }),
+    event_kind: "bda_inventory",
+    utility_command: utilityCommand,
+    source,
+    installer_version: data.installer_version || config.installer_version || "",
+    bda_cli_version: data.bda_cli_version || cliVersion(),
+    bda_ai_dev_standard_version: data.bda_ai_dev_standard_version || data.after_version || cliVersion(),
+    before_version: data.before_version || "",
+    after_version: data.after_version || "",
+    standard_dir: data.standard_dir || "",
+    used_git_repo: Boolean(data.used_git_repo),
+    doctor_issue_count: numValue(data.doctor_issue_count),
+    hermes_state_total_bytes: numValue(data.hermes_state_total_bytes),
+    request_dump_total_bytes: numValue(data.request_dump_total_bytes),
+    gateway_models_count: numValue(data.gateway_models_count),
+    reported_at: new Date().toISOString(),
+  };
+  return sendEvent(config, event, args);
+}
+
 function saveSession(config, session) {
   const filePath = sessionPath(config);
   ensureDir(path.dirname(filePath));
@@ -634,7 +674,7 @@ function printVersion() {
     ok: true,
     name: "bda-ai-dev-standard",
     session_version: SESSION_VERSION,
-    cli_version: SESSION_VERSION.replace(/^bda-session\//, ""),
+    cli_version: cliVersion(),
   }, null, 2));
 }
 
@@ -696,6 +736,16 @@ async function updateStandard(args, config = {}) {
     ? cleanHermesConfig({ dryRun: true, models: gatewayModels })
     : cleanHermesConfigWithUpdatedScript(standardDir, gatewayModels);
   const thclawsResult = syncThclawsCatalogue(gatewayModels, { dryRun });
+  const inventorySendResult = await sendInventoryEvent(config, args, {
+    source: "bda update",
+    utility_command: "bda update",
+    before_version: beforeVersion,
+    after_version: afterVersion,
+    bda_ai_dev_standard_version: afterVersion,
+    standard_dir: standardDir,
+    used_git_repo: hasGitRepo,
+    gateway_models_count: gatewayModels.length,
+  });
 
   console.log(JSON.stringify({
     ok: true,
@@ -708,6 +758,7 @@ async function updateStandard(args, config = {}) {
     gateway_models: gatewayModels,
     hermes_config: configResult,
     thclaws_config: thclawsResult,
+    inventory_send_result: inventorySendResult,
     note: "Restart Hermes Desktop after update if it is open. Hermes BDA provider/model config has been cleaned so only the BDA AI Gateway group remains.",
   }, null, 2));
 }
@@ -754,7 +805,7 @@ function removeTopLevelBlocks(yamlText, keys) {
 
 function removeLegacyAgentCommandCatalog(yamlText) {
   return yamlText
-    .replace(/You are running with BDA AI Dev Standard v[0-9.]+/g, "You are running with BDA AI Dev Standard v0.11.4")
+    .replace(/You are running with BDA AI Dev Standard v[0-9.]+/g, "You are running with BDA AI Dev Standard v0.11.5")
     .replace(/During an active session, treat bda-dev-\*, bda-nondev-\*, and bda-pm-\* prefixes as real BDA work commands and send\/prepare bda event\./g,
       "During an active session, use only the compact BDA commands: bda-dev, bda-nondev, and bda-pm. Send/prepare bda event for meaningful subtasks.")
     .replace(/Command catalog: bda-dev-debug, bda-dev-review, bda-dev-tdd, bda-dev-plan-discuss, bda-dev-plan-create, bda-dev-plan-execute, bda-dev-plan-review, bda-dev-plan-verify, bda-nondev-explore, bda-nondev-write, bda-pm-log, bda-pm-status, bda-pm-risk, bda-pm-followup, bda-pm-requirement, bda-pm-standup\./g,
@@ -990,7 +1041,7 @@ function buildDoctorReport(config = {}, fixResult = null) {
     ok: issues.length === 0,
     action: "doctor",
     version: SESSION_VERSION,
-    bda_cli_version: SESSION_VERSION.replace(/^bda-session\//, ""),
+    bda_cli_version: cliVersion(),
     platform: process.platform,
     employee_code: config.employee_code || "",
     employee_group: config.employee_group || "",
@@ -1008,11 +1059,20 @@ function buildDoctorReport(config = {}, fixResult = null) {
   };
 }
 
-function printDoctor(config = {}, args = {}) {
+async function printDoctor(config = {}, args = {}) {
   const shouldFix = boolValue(args.fix) || boolValue(args.yes);
   let fixResult = null;
   if (shouldFix) fixResult = moveHermesState(config, { dryRun: false });
-  console.log(JSON.stringify(buildDoctorReport(config, fixResult), null, 2));
+  const report = buildDoctorReport(config, fixResult);
+  report.inventory_send_result = await sendInventoryEvent(config, args, {
+    source: "bda doctor",
+    utility_command: shouldFix ? "bda doctor --fix" : "bda doctor",
+    bda_ai_dev_standard_version: report.bda_cli_version,
+    doctor_issue_count: report.issues.length,
+    hermes_state_total_bytes: report.hermes_state_total_bytes,
+    request_dump_total_bytes: report.request_dump_total_bytes,
+  });
+  console.log(JSON.stringify(report, null, 2));
 }
 
 async function printHermesReset(config = {}, args = {}) {

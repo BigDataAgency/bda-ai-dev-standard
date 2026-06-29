@@ -25,6 +25,8 @@ bda doctor --fix
 bda update
 ```
 
+From 0.11.5 onward, `bda update` and `bda doctor` also report `event_kind: bda_inventory` to the work-event backend when configured. Grafana/AdminA40 should read that latest inventory record for the current installed CLI/standard version. Installer package version remains useful for rollout audit only; it is not the current version after an employee runs `bda update`.
+
 `bda doctor` must:
 
 - print installed CLI/session version
