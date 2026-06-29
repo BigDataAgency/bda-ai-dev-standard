@@ -102,6 +102,7 @@ assert.match(help.stdout, /bda-session\/0\.11\.1/);
 assert.match(help.stdout, /bda update/);
 assert.match(help.stdout, /bda config-status/);
 assert.match(help.stdout, /bda config-clean/);
+assert.match(help.stdout, /bda hermes-reset/);
 
 const version = run(["version"]);
 const versionJson = JSON.parse(version.stdout);
@@ -148,6 +149,25 @@ assert.equal(configCleanJson.hermes_config.config_paths[0].changed, true);
 const configStatusAfterClean = run(["config-status"]);
 const configStatusAfterCleanJson = JSON.parse(configStatusAfterClean.stdout);
 assert.equal(configStatusAfterCleanJson.hermes_config.config_paths[0].changed, false);
+
+fs.mkdirSync(path.join(home, ".hermes", "sessions"), { recursive: true });
+fs.mkdirSync(path.join(home, ".hermes", "pastes"), { recursive: true });
+fs.writeFileSync(path.join(home, ".hermes", "sessions", "request_dump_test.json"), "{}\n");
+fs.writeFileSync(path.join(home, ".hermes", "pastes", "paste_1.txt"), "large stale paste\n");
+fs.writeFileSync(path.join(home, ".hermes", "state.db"), "stale state\n");
+const hermesResetDryRun = run(["hermes-reset", "--dry-run"]);
+const hermesResetDryRunJson = JSON.parse(hermesResetDryRun.stdout);
+assert.equal(hermesResetDryRunJson.ok, true);
+assert.equal(hermesResetDryRunJson.dry_run, true);
+assert.equal(fs.existsSync(path.join(home, ".hermes", "state.db")), true);
+const hermesReset = run(["hermes-reset"]);
+const hermesResetJson = JSON.parse(hermesReset.stdout);
+assert.equal(hermesResetJson.ok, true);
+assert.equal(hermesResetJson.action, "hermes-reset");
+assert.equal(fs.existsSync(path.join(home, ".hermes", "state.db")), false);
+assert.equal(fs.existsSync(path.join(home, ".hermes", "sessions")), false);
+assert.equal(fs.existsSync(path.join(home, ".hermes", "config.yaml")), true);
+assert.ok(hermesResetJson.hermes_state.moved.some((entry) => entry.from.endsWith(path.join(".hermes", "state.db"))));
 
 const start = run([
   "start",

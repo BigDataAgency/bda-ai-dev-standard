@@ -78,6 +78,30 @@ const HERMES_CACHE_PATHS = [
   process.env.APPDATA ? path.join(process.env.APPDATA, "Hermes", "ollama_cloud_models_cache.json") : "",
   process.env.APPDATA ? path.join(process.env.APPDATA, "Hermes", "cache", "model_catalog.json") : "",
 ].filter(Boolean);
+const HERMES_STATE_PATHS = Array.from(new Set([
+  path.join(os.homedir(), ".hermes", "sessions"),
+  path.join(os.homedir(), ".hermes", "pastes"),
+  path.join(os.homedir(), ".hermes", "state.db"),
+  path.join(os.homedir(), ".hermes", "state.db-wal"),
+  path.join(os.homedir(), ".hermes", "state.db-shm"),
+  path.join(MAC_HERMES_APP_SUPPORT, "Session Storage"),
+  path.join(MAC_HERMES_APP_SUPPORT, "Local Storage"),
+  path.join(MAC_HERMES_APP_SUPPORT, "IndexedDB"),
+  process.env.LOCALAPPDATA ? path.join(process.env.LOCALAPPDATA, "hermes", "sessions") : "",
+  process.env.LOCALAPPDATA ? path.join(process.env.LOCALAPPDATA, "hermes", "pastes") : "",
+  process.env.LOCALAPPDATA ? path.join(process.env.LOCALAPPDATA, "hermes", "state.db") : "",
+  process.env.LOCALAPPDATA ? path.join(process.env.LOCALAPPDATA, "hermes", "state.db-wal") : "",
+  process.env.LOCALAPPDATA ? path.join(process.env.LOCALAPPDATA, "hermes", "state.db-shm") : "",
+  process.env.LOCALAPPDATA ? path.join(process.env.LOCALAPPDATA, "Hermes", "sessions") : "",
+  process.env.LOCALAPPDATA ? path.join(process.env.LOCALAPPDATA, "Hermes", "pastes") : "",
+  process.env.LOCALAPPDATA ? path.join(process.env.LOCALAPPDATA, "Hermes", "state.db") : "",
+  process.env.LOCALAPPDATA ? path.join(process.env.LOCALAPPDATA, "Hermes", "state.db-wal") : "",
+  process.env.LOCALAPPDATA ? path.join(process.env.LOCALAPPDATA, "Hermes", "state.db-shm") : "",
+  process.env.APPDATA ? path.join(process.env.APPDATA, "hermes", "Session Storage") : "",
+  process.env.APPDATA ? path.join(process.env.APPDATA, "hermes", "Local Storage") : "",
+  process.env.APPDATA ? path.join(process.env.APPDATA, "Hermes", "Session Storage") : "",
+  process.env.APPDATA ? path.join(process.env.APPDATA, "Hermes", "Local Storage") : "",
+].filter(Boolean)));
 
 function bdaModelContextLength(model) {
   if (model.includes("qwen3.7") || model.includes("minimax")) return 262144;
@@ -783,6 +807,64 @@ function cleanHermesConfig({ dryRun = false, models = modelsFromEnvOverride() } 
   return result;
 }
 
+function safeBackupName(filePath) {
+  return filePath
+    .replaceAll("\\", "_")
+    .replaceAll("/", "_")
+    .replaceAll(":", "")
+    .replace(/^_+/, "");
+}
+
+function moveHermesState(config = {}, { dryRun = false } = {}) {
+  const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+Z$/, "Z");
+  const backupDir = path.join(configDir(config), "hermes-state-backups", stamp);
+  const result = {
+    backup_dir: backupDir,
+    moved: [],
+    missing: [],
+    errors: [],
+    dry_run: dryRun,
+  };
+
+  for (const statePath of HERMES_STATE_PATHS) {
+    if (!fs.existsSync(statePath)) {
+      result.missing.push(statePath);
+      continue;
+    }
+    const backupPath = path.join(backupDir, safeBackupName(statePath));
+    result.moved.push({ from: statePath, to: backupPath });
+    if (dryRun) continue;
+    try {
+      ensureDir(path.dirname(backupPath));
+      fs.renameSync(statePath, backupPath);
+    } catch (error) {
+      result.errors.push({ path: statePath, error: error.message });
+    }
+  }
+  return result;
+}
+
+async function printHermesReset(config = {}, args = {}) {
+  const dryRun = boolValue(args.dry_run);
+  const stateResult = moveHermesState(config, { dryRun });
+  const models = await fetchBdaGatewayModels(config);
+  const configResult = cleanHermesConfig({ dryRun, models });
+  const hermesEnv = syncHermesEnv(config, { dryRun });
+  const thclaws = syncThclawsCatalogue(models, { dryRun });
+  console.log(JSON.stringify({
+    ok: stateResult.errors.length === 0,
+    action: "hermes-reset",
+    dry_run: dryRun,
+    hermes_state: stateResult,
+    gateway_models: models,
+    hermes_config: configResult,
+    hermes_env: hermesEnv,
+    thclaws_config: thclaws,
+    note: "Close Hermes Desktop before running this command. This archives Hermes chat/session state only; config.yaml, .env, and API keys are kept. Open Hermes again and start a fresh chat after reset.",
+  }, null, 2));
+  if (stateResult.errors.length) process.exit(1);
+}
+
 function syncHermesEnv(config = {}, { dryRun = false } = {}) {
   const apiKey = envOrConfig(
     ["BDA_AI_ROUTER_API_KEY", "BDA_WORK_EVENT_API_KEY", "OPENAI_API_KEY"],
@@ -934,12 +1016,14 @@ Flow:
   bda update  อัปเดต BDA AI Dev Standard โดยไม่ต้องแจก zip ใหม่
   bda config-status  ตรวจ Hermes provider/model config ที่ bda update จะ rewrite
   bda config-clean   rewrite Hermes provider/model config และล้าง model cache ทันที
+  bda hermes-reset   archive Hermes chat/session state ที่ทำให้ context เก่าติดมา โดยไม่ลบ key/config
   bda event   ส่ง event ระหว่าง session เช่น command ย่อย/งานย่อย
   bda stop    ปิด session และส่ง status=done/blocked/failed
 
 Examples:
   bda start --project "BDA-InnoHub" --task "debug login error" --command bda-dev --work-type debug
   bda update
+  bda hermes-reset
   bda event --command bda-dev --work-type review --task "review login fix" --status done
   bda stop --status done --outcome "fixed login validation" --next-step "deploy to staging"
 
@@ -1090,6 +1174,7 @@ async function main() {
   if (subcommand === "update") return updateStandard(args, config);
   if (subcommand === "config-status") return printConfigStatus(config);
   if (subcommand === "config-clean") return printConfigClean(config);
+  if (subcommand === "hermes-reset") return printHermesReset(config, args);
   if (subcommand === "start") return start(config, args);
   if (subcommand === "event") return event(config, args);
   if (subcommand === "stop") return stop(config, args);
