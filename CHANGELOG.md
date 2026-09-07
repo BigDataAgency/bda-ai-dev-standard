@@ -13,6 +13,7 @@ This project uses Semantic Versioning: `MAJOR.MINOR.PATCH`.
 ### Changed
 
 - Renamed the public brand to **AKS AI Dev Standard**.
+- Added a separate `AI pass via BDA LiteLLM` provider to employee Hermes config. It discovers only the chat models available from the employee's own AI pass sidecar and does not assign unverified context-window values.
 - Added `aks` as the primary CLI name while keeping `bda` as a permanent alias for existing employees, scripts, and cron jobs.
 - Added `AKS_*` environment variables as primary inputs while keeping every legacy `BDA_*` variable as a permanent fallback.
 - Bumped repo/package version to `1.0.0`.

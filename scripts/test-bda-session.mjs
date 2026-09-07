@@ -241,11 +241,11 @@ assert.ok(updateJson.hermes_config.config_paths[0].after_models.includes("bda/qw
 assert.ok(updateJson.hermes_config.config_paths[0].after_models.includes("bda/qwen3.7-max-paid-cloud"));
 assert.ok(updateJson.hermes_config.config_paths[0].after_models.includes("bda/glm-5.1-paid-cloud"));
 assert.ok(updateJson.hermes_config.config_paths[0].after_models.includes("bda/minimax-m3-paid-cloud"));
-assert.equal(updateJson.hermes_config.config_paths[0].after_models.length, 10);
+assert.ok(updateJson.hermes_config.config_paths[0].after_models.includes("bda/aipass-model/gemini-3.1-flash-lite"));
+assert.equal(updateJson.hermes_config.config_paths[0].after_models.length, 11);
 assert.ok(!updateJson.hermes_config.config_paths[0].after_models.includes("bda/gemma-4-26b-a4b-local"));
 assert.ok(!updateJson.hermes_config.config_paths[0].after_models.includes("bda/gpt-oss-20b-local"));
 assert.ok(!updateJson.hermes_config.config_paths[0].after_models.includes("bda/kimi-k2.7-code-paid-cloud"));
-
 const configStatus = run(["config-status"]);
 const configStatusJson = JSON.parse(configStatus.stdout);
 assert.equal(configStatusJson.ok, true);
@@ -255,6 +255,14 @@ const configClean = run(["config-clean"]);
 const configCleanJson = JSON.parse(configClean.stdout);
 assert.equal(configCleanJson.ok, true);
 assert.equal(configCleanJson.hermes_config.config_paths[0].changed, true);
+const cleanedHermesConfig = fs.readFileSync(path.join(home, ".hermes", "config.yaml"), "utf8");
+assert.match(cleanedHermesConfig, /aipass-litellm:/);
+assert.match(cleanedHermesConfig, /X-BDA-AiPASS-Catalog: chat/);
+assert.match(cleanedHermesConfig, /discover_models: true/);
+assert.equal(
+  [...cleanedHermesConfig.matchAll(/bda\/aipass-model\/gemini-3\.1-flash-lite/g)].length,
+  1,
+);
 const configStatusAfterClean = run(["config-status"]);
 const configStatusAfterCleanJson = JSON.parse(configStatusAfterClean.stdout);
 assert.equal(configStatusAfterCleanJson.hermes_config.config_paths[0].changed, false);

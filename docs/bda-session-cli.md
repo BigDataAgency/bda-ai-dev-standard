@@ -74,7 +74,7 @@ aks update
 
 `aks update` refreshes the local standard repo from `main` using git and overwrites local edits in `~/.bda-ai-dev-standard`. This is intentional for employee machines; the standard is centrally managed. `bda update` remains a permanent alias for existing employees, scripts, and cron jobs. Restart Hermes Desktop after the update if it is open.
 
-Important: `aks update` / `bda update` updates command/session behavior, cleans Hermes BDA provider/model config, and keeps the supported local models by their real names plus paid cloud models: `bda/qwable-27b-local`, `bda/qwythos-9b-local`, DeepSeek, Qwen3.7, GLM 5.1, and MiniMax M3. Restart Hermes Desktop after the update so the model picker reloads without the legacy BDA group. If Hermes still shows two BDA groups, close Hermes, run `aks config-clean` or `bda config-clean`, and open Hermes again.
+Important: `aks update` / `bda update` updates command/session behavior, cleans Hermes provider/model config, and keeps the supported BDA models plus an `AI pass via BDA LiteLLM` provider. The AI pass provider discovers the chat models available from the employee's own AI pass account; it never uses another employee's session. Restart Hermes Desktop after the update so the model picker reloads. If Hermes still shows an old or duplicate group, close Hermes, run `aks config-clean` or `bda config-clean`, and open Hermes again.
 
 ## Model Change Runbook
 
