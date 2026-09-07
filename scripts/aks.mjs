@@ -995,13 +995,16 @@ async function updateStandard(args, config = {}) {
     thclaws_config: thclawsResult,
     client_setup: clientSetup,
     inventory_send_result: inventorySendResult,
-    note: "Restart Hermes Desktop after update if it is open. Hermes BDA provider/model config has been cleaned so only the BDA AI Gateway group remains.",
+    note: "Restart Hermes Desktop after update if it is open. Hermes config now includes the BDA AI Gateway and the employee's personal AI pass provider.",
   }, null, 2));
 }
 
 function cleanHermesConfigWithUpdatedScript(standardDir, gatewayModels = FALLBACK_BDA_MODELS) {
   const updatedScript = path.join(standardDir, "scripts", "aks.mjs");
-  if (fs.existsSync(updatedScript) && path.resolve(updatedScript) !== path.resolve(new URL(import.meta.url).pathname)) {
+  // The update may overwrite the script that is currently executing. Always
+  // launch config-clean in a fresh Node process so it reads the fetched code,
+  // even when standardDir is the same checkout as this process.
+  if (fs.existsSync(updatedScript)) {
     try {
       const raw = execFileSync(process.execPath, [updatedScript, "config-clean"], {
         encoding: "utf8",
