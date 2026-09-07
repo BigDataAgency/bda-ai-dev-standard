@@ -195,7 +195,12 @@ function bdaModelMaxOutput(model) {
 }
 
 function buildHermesBdaConfigBlock(models = FALLBACK_BDA_MODELS) {
-  const uniqueModels = [...new Set(models)].filter((model) => model.startsWith("bda/"));
+  // AI pass models are discovered by their own provider below. Keeping them out
+  // of the static BDA model map avoids duplicate picker entries and invented
+  // context-window values for models whose metadata AI pass does not publish.
+  const uniqueModels = [...new Set(models)].filter(
+    (model) => model.startsWith("bda/") && !model.startsWith("bda/aipass-model/"),
+  );
   const defaultModel = uniqueModels.includes("bda/qwable-27b-local")
     ? "bda/qwable-27b-local"
     : uniqueModels[0] || "bda/qwable-27b-local";
@@ -233,6 +238,15 @@ providers:
     discover_models: false
     models:
 ${modelEntries}
+  aipass-litellm:
+    name: AI pass via BDA LiteLLM
+    api: ${BDA_GATEWAY_BASE_URL}
+    key_env: BDA_AI_ROUTER_API_KEY
+    transport: openai_chat
+    default_model: bda/aipass-model/gemini-3.1-flash-lite
+    discover_models: true
+    extra_headers:
+      X-BDA-AiPASS-Catalog: chat
 `;
 }
 
@@ -1044,7 +1058,7 @@ function removeLegacyAgentCommandCatalog(yamlText) {
 
 function collectBdaModelNames(yamlText) {
   const names = new Set();
-  const modelPattern = /\bbda\/[A-Za-z0-9._-]+/g;
+  const modelPattern = /\bbda\/[A-Za-z0-9@._/-]+/g;
   for (const match of yamlText.matchAll(modelPattern)) names.add(match[0]);
   return [...names].sort();
 }
